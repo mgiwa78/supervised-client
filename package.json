@@ -93,10 +93,6 @@
     "custom-start": "webpack --config=webpack.config.js",
     "rtl": "webpack --config=rtl.config.js"
   },
-  "browser": {
-    "path": false,
-    "stream": false
-  },
   "eslintConfig": {
     "extends": [
       "react-app",
