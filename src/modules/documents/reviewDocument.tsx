@@ -142,7 +142,7 @@ const ReviewDocument = () => {
         {content, comments},
         token,
         true,
-        'Document Updated'
+        'Review Saved'
       )
       console.log(RESPONSE)
     }

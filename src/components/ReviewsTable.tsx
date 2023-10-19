@@ -33,7 +33,6 @@ const ReviewsTable = ({title, reviewSessions, isLoading, assginDoc}: Props) => {
     )
 
     const reviewData = RESPONSE.data
-    console.log(reviewData)
 
     if (reviewData._id) {
       navigate(`/documents/review/${reviewData._id}`)
