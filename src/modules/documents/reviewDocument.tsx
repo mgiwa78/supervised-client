@@ -20,6 +20,7 @@ import CustomHighlighting from '../../utils/custom-highlighting'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/monokai-sublime.css'
 import EditorToolbar, {modules, formats} from '../../quill/Toolbar'
+import {ReviewChat} from '../../components/reviewChat'
 
 const ReviewDocument = () => {
   const {token} = useSelector(selectAuth)
@@ -149,18 +150,26 @@ const ReviewDocument = () => {
 
       <div className='card'>
         <div className='card-body'>
-          {/* <div id='editor'>{content}</div> */}
-          <EditorToolbar />
-          {assignedDocument && (
-            <ReactQuill
-              theme='snow'
-              value={content}
-              onChange={handleChange}
-              placeholder={'Write something awesome...'}
-              modules={modules}
-              formats={formats}
-            />
-          )}
+          <div className='row'>
+            <div className='col-8'>
+              {' '}
+              {/* <div id='editor'>{content}</div> */}
+              <EditorToolbar />
+              {assignedDocument && (
+                <ReactQuill
+                  theme='snow'
+                  value={content}
+                  onChange={handleChange}
+                  placeholder={'Write something awesome...'}
+                  modules={modules}
+                  formats={formats}
+                />
+              )}
+            </div>
+            <div className='col-4'>
+              <ReviewChat />
+            </div>
+          </div>
         </div>
         <div className='card-footer'>
           <button className='btn btn-primary' onClick={(e) => handleDocumentUpdate(e)}>
