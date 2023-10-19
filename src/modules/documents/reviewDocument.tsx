@@ -24,16 +24,25 @@ import {ReviewChat} from '../../components/reviewChat'
 
 const ReviewDocument = () => {
   const {token} = useSelector(selectAuth)
-  const {documentID} = useParams()
+  const {reviewSessionId} = useParams()
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
 
-  const editorRef = useRef<HTMLDivElement | null>(null)
-  const [quill, setQuill] = useState<Quill | null>(null)
+  const [reviewData, setReviewData] = useState(null)
+  const [comments, setComments] = useState([])
 
   const [assignedDocument, setAssignedDocument] = useState<TDocument | null>(null)
   const [content, setContent] = useState<any>('')
+  const [quill, setQuill] = useState<Quill | null>(null)
+
+  const getReviewdata = async () => {
+    const RESPONSE = await get(`reviewSessions/${reviewSessionId}`, token)
+    setContent(RESPONSE.data.content)
+    setReviewData(RESPONSE.data)
+  }
+
+  const editorRef = useRef<HTMLDivElement | null>(null)
 
   const doc = useSelector(selectDocumentForEdit)
   const reviewDocumentsBreadcrumbs: Array<PageLink> = [
@@ -55,7 +64,7 @@ const ReviewDocument = () => {
     setIsLoading(true)
     try {
       if (token) {
-        const RESPONSE = await get(`documents/assigned/${documentID}`, token)
+        const RESPONSE = await get(`documents/assigned/${reviewData.document}`, token)
         setAssignedDocument(RESPONSE.data)
         setContent(RESPONSE.data.content)
 
@@ -69,17 +78,16 @@ const ReviewDocument = () => {
   }
 
   useEffect(() => {
-    getAssignedDocument()
-  }, [])
+    if (reviewData) {
+      console.log(reviewData)
+      // getAssignedDocument()
+      setComments(reviewData.comments)
+    }
+  }, [reviewData])
 
   useEffect(() => {
-    if (assignedDocument) {
-      if (quill) {
-        console.log('first')
-        // quill.clipboard.dangerouslyPasteHTML(assignedDocument.content)
-      }
-    }
-  }, [assignedDocument])
+    getReviewdata()
+  }, [])
 
   // dispatch(setDocForEdit({document: null}))
   // const editor = reactQuillRef.getEditor()
@@ -121,19 +129,22 @@ const ReviewDocument = () => {
       setQuill(editor)
     }
   }, [])
+
   const handleChange = (value: any) => {
     setContent(value)
   }
-  const handleDocumentUpdate = async (e: any) => {
+  const handleReviewUpdate = async (e: any) => {
     e.preventDefault()
+    console.log(reviewData)
     if (quill) {
       const RESPONSE = await put(
-        `documents/${documentID}`,
-        {...document, content: quill.root.innerHTML},
+        `reviewSessions/${reviewData._id}`,
+        {content, comments},
         token,
         true,
         'Document Updated'
       )
+      console.log(RESPONSE)
     }
 
     setIsLoading(false)
@@ -143,36 +154,39 @@ const ReviewDocument = () => {
     <>
       <PageTitle breadcrumbs={reviewDocumentsBreadcrumbs}>Review Document </PageTitle>
       {isLoading && <Spinner />}
-
-      <div>
-        <h2 className='my-3'>{assignedDocument?.title}</h2>
-      </div>
-
-      <div className='card'>
-        <div className='card-body'>
-          <div className='row'>
-            <div className='col-8'>
-              {' '}
-              {/* <div id='editor'>{content}</div> */}
+      <>
+        <div>
+          <h2 className='my-3'>{assignedDocument?.title}</h2>
+        </div>
+        <div className='row mb-5' style={{minHeight: '70vh', height: 'max-content'}}>
+          <div className='col-12 col-lg-8 mb-20 mb-lg-0'>
+            <div className='card-body '>
               <EditorToolbar />
-              {assignedDocument && (
-                <ReactQuill
-                  theme='snow'
-                  value={content}
-                  onChange={handleChange}
-                  placeholder={'Write something awesome...'}
-                  modules={modules}
-                  formats={formats}
-                />
-              )}
-            </div>
-            <div className='col-4'>
-              <ReviewChat />
+
+              <ReactQuill
+                theme='snow'
+                value={content}
+                style={{height: '434px'}}
+                onChange={handleChange}
+                placeholder={'Loading document...'}
+                modules={modules}
+                formats={formats}
+              />
+            </div>{' '}
+          </div>
+          <div className='col-12 col-lg-4'>
+            <div className='card p-0'>
+              <div className='card-body p-0' style={{height: '494px', overflow: 'scroll'}}>
+                <ReviewChat comments={comments} setComments={setComments} />
+              </div>
             </div>
           </div>
         </div>
+      </>
+
+      <div className='card'>
         <div className='card-footer'>
-          <button className='btn btn-primary' onClick={(e) => handleDocumentUpdate(e)}>
+          <button className='btn btn-primary' onClick={(e) => handleReviewUpdate(e)}>
             {!loading && <span className='indicator-label'>Save Review</span>}
             {loading && (
               <span className='indicator-progress' style={{display: 'block'}}>

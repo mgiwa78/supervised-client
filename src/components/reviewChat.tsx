@@ -9,36 +9,59 @@ import {
   UserInfoModel,
   messageFromClient,
 } from '../_metronic/helpers'
+import TComment from '../types/Comment'
+import post from '../lib/post'
+import {useSelector} from 'react-redux'
+import {selectToken, selectUser} from '../redux/selectors/auth'
+import {useParams} from 'react-router'
+import {bottom} from '@popperjs/core'
+import FormatDate from '../utils/FormatDate'
 
 type Props = {
   isDrawer?: boolean
+  comments: Array<TComment>
+  setComments: Function
 }
 
 const bufferMessages = defaultMessages
 
-const ReviewChat: FC<Props> = ({isDrawer = false}) => {
+const ReviewChat: FC<Props> = ({isDrawer = false, comments = [], setComments}) => {
+  const {reviewSessionId} = useParams()
+  const user = useSelector(selectUser)
   const [chatUpdateFlag, toggleChatUpdateFlat] = useState<boolean>(false)
-  const [message, setMessage] = useState<string>('')
-  const [messages, setMessages] = useState<MessageModel[]>(bufferMessages)
+  const [comment, setComment] = useState<string>('')
+
+  // const [allComments, setAllComments] = useState<TComment[]>(comments)
   const [userInfos] = useState<UserInfoModel[]>(defaultUserInfos)
 
-  const sendMessage = () => {
+  const token = useSelector(selectToken)
+
+  const sendMessage = async () => {
     const newMessage: MessageModel = {
       user: 2,
       type: 'out',
-      text: message,
+      text: comment,
       time: 'Just now',
     }
 
-    bufferMessages.push(newMessage)
-    setMessages(bufferMessages)
-    toggleChatUpdateFlat(!chatUpdateFlag)
-    setMessage('')
-    setTimeout(() => {
-      bufferMessages.push(messageFromClient)
-      setMessages(() => bufferMessages)
-      toggleChatUpdateFlat((flag) => !flag)
-    }, 1000)
+    // bufferMessages.push(newMessage)
+    // setMessages(bufferMessages)
+    // toggleChatUpdateFlat(!chatUpdateFlag)
+    // setMessage('')
+    // setTimeout(() => {
+    //   bufferMessages.push(messageFromClient)
+    //   setMessages(() => bufferMessages)
+    //   toggleChatUpdateFlat((flag) => !flag)
+    // }, 1000)
+    const RESPONSE = await post(
+      `reviewSessions/comment/${reviewSessionId}`,
+      {comment},
+      token,
+      false
+    )
+    if (RESPONSE.data) {
+      setComments(RESPONSE.data)
+    }
   }
 
   const onEnterPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -51,10 +74,11 @@ const ReviewChat: FC<Props> = ({isDrawer = false}) => {
   return (
     <div
       className='card-body'
+      style={{height: '100%', position: 'relative'}}
       id={isDrawer ? 'kt_drawer_chat_messenger_body' : 'kt_chat_messenger_body'}
     >
       <div
-        className={clsx('scroll-y me-n5 pe-5', {'h-300px h-lg-auto': !isDrawer})}
+        className={clsx('scroll-y me-n5 pe-5', {'h-200px h-lg-auto': !isDrawer})}
         data-kt-element='messages'
         data-kt-scroll='true'
         data-kt-scroll-activate='{default: false, lg: true}'
@@ -71,91 +95,98 @@ const ReviewChat: FC<Props> = ({isDrawer = false}) => {
         }
         data-kt-scroll-offset={isDrawer ? '0px' : '5px'}
       >
-        {messages.map((message, index) => {
-          const userInfo = userInfos[message.user]
-          const state = message.type === 'in' ? 'info' : 'primary'
-          const templateAttr = {}
-          if (message.template) {
-            Object.defineProperty(templateAttr, 'data-kt-element', {
-              value: `template-${message.type}`,
-            })
-          }
-          const contentClass = `${isDrawer ? '' : 'd-flex'} justify-content-${
-            message.type === 'in' ? 'start' : 'end'
-          } mb-10`
-          return (
-            <div
-              key={`message${index}`}
-              className={clsx('d-flex', contentClass, 'mb-10', {'d-none': message.template})}
-              {...templateAttr}
-            >
+        {comments.length > 0 &&
+          comments.map((message, index) => {
+            // const userInfo = userInfos[message.user]
+            const state = message.author === user._id ? 'info' : 'primary'
+            const templateAttr = {}
+            if (message.template) {
+              Object.defineProperty(templateAttr, 'data-kt-element', {
+                value: `template-${message.author === user._id}`,
+              })
+            }
+            const contentClass = `${isDrawer ? '' : 'd-flex'} justify-content-${
+              message.author === user._id ? 'start' : 'end'
+            } mb-10`
+            return (
               <div
-                className={clsx(
-                  'd-flex flex-column align-items',
-                  `align-items-${message.type === 'in' ? 'start' : 'end'}`
-                )}
+                key={`message${index}`}
+                className={clsx('d-flex', contentClass, 'mb-10', {'d-none': message.template})}
+                {...templateAttr}
               >
-                <div className='d-flex align-items-center mb-2'>
-                  {message.type === 'in' ? (
-                    <>
-                      <div className='symbol  symbol-35px symbol-circle '>
-                        <img alt='Pic' src={toAbsoluteUrl(`/media/${userInfo.avatar}`)} />
-                      </div>
-                      <div className='ms-3'>
-                        <a
-                          href='#'
-                          className='fs-5 fw-bolder text-gray-900 text-hover-primary me-1'
-                        >
-                          {userInfo.name}
-                        </a>
-                        <span className='text-muted fs-7 mb-1'>{message.time}</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className='me-3'>
-                        <span className='text-muted fs-7 mb-1'>{message.time}</span>
-                        <a
-                          href='#'
-                          className='fs-5 fw-bolder text-gray-900 text-hover-primary ms-1'
-                        >
-                          You
-                        </a>
-                      </div>
-                      <div className='symbol  symbol-35px symbol-circle '>
-                        <img alt='Pic' src={toAbsoluteUrl(`/media/${userInfo.avatar}`)} />
-                      </div>
-                    </>
-                  )}
-                </div>
-
                 <div
                   className={clsx(
-                    'p-5 rounded',
-                    `bg-light-${state}`,
-                    'text-dark fw-bold mw-lg-400px',
-                    `text-${message.type === 'in' ? 'start' : 'end'}`
+                    'd-flex flex-column align-items',
+                    `align-items-${message.author === user._id ? 'start' : 'end'}`
                   )}
-                  data-kt-element='message-text'
-                  dangerouslySetInnerHTML={{__html: message.text}}
-                ></div>
+                >
+                  <div className='d-flex align-items-center mb-2'>
+                    {typeof message.author !== 'string' && message.author._id === user._id ? (
+                      <>
+                        <div className='symbol  symbol-35px symbol-circle '>
+                          <img alt='Pic' src={toAbsoluteUrl(`/media/avatars/blank.png`)} />
+                        </div>
+                        <div className='ms-3'>
+                          <a
+                            href='#'
+                            className='fs-7 fw-bolder text-gray-900 text-hover-primary me-1'
+                          >
+                            {message.author.firstName}
+                            {message.author.lastName}
+                          </a>{' '}
+                          <br />
+                          <span className='text-muted fs-7 mb-1'>
+                            {' '}
+                            {FormatDate(message.createdAt)}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className='me-3'>
+                          <span className='text-muted fs-7 mb-1'>{message.createdAt}</span>
+                          <a
+                            href='#'
+                            className='fs-5 fw-bolder text-gray-900 text-hover-primary ms-1'
+                          >
+                            You
+                          </a>
+                        </div>
+                        <div className='symbol  symbol-35px symbol-circle '>
+                          <img alt='Pic' src={toAbsoluteUrl(`/media/avatars/blank.png`)} />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div
+                    className={clsx(
+                      'p-5 rounded',
+                      `bg-light-${state}`,
+                      'text-dark fw-bold mw-lg-400px',
+                      `text-${message.author === user._id ? 'start' : 'end'}`
+                    )}
+                    data-kt-element='message-text'
+                    dangerouslySetInnerHTML={{__html: message.content}}
+                  ></div>
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
       </div>
 
       <div
         className='card-footer pt-4'
         id={isDrawer ? 'kt_drawer_chat_messenger_footer' : 'kt_chat_messenger_footer'}
+        style={{position: 'absolute', bottom: '10px', width: '90%'}}
       >
         <textarea
           className='form-control form-control-flush mb-3'
           rows={1}
           data-kt-element='input'
           placeholder='Type a message'
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
           onKeyDown={onEnterPress}
         ></textarea>
 

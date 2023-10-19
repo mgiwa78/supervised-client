@@ -1,11 +1,12 @@
 import React from 'react'
 import TDocument from '../types/Document'
 import {KTIcon} from '../_metronic/helpers'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import {Spinner} from './Spinner'
 import FormatDate from '../utils/FormatDate'
 import {useSelector} from 'react-redux'
-import {selectAuth, selectUser} from '../redux/selectors/auth'
+import {selectAuth, selectToken, selectUser} from '../redux/selectors/auth'
+import post from '../lib/post'
 type Props = {
   isLoading: boolean
   title: string
@@ -14,6 +15,30 @@ type Props = {
 }
 const DocumentTable = ({title, documents, isLoading, assginDoc}: Props) => {
   const currentUser = useSelector(selectUser)
+  const token = useSelector(selectToken)
+
+  const navigate = useNavigate()
+
+  const initailizeReviewSession = async (doc: string) => {
+    const RESPONSE: any = await post(
+      'reviewSession/initialize',
+      {
+        supervisorId: currentUser._id,
+        documentId: doc,
+      },
+      token,
+      true,
+      'Document Created'
+    )
+
+    const reviewData = RESPONSE.data
+    console.log(reviewData)
+
+    if (reviewData._id) {
+      navigate(`/documents/review/${reviewData._id}`)
+    }
+  }
+
   return (
     <div>
       <div className={`card mb-5 mb-xl-8`}>
@@ -148,13 +173,22 @@ const DocumentTable = ({title, documents, isLoading, assginDoc}: Props) => {
                             </span>
                           )}
                           {currentUser?.roles.some((role: any) => role.name === 'Supervisor') && (
-                            <Link
-                              to={`/documents/review/${document._id}`}
-                              title='Review'
-                              className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1'
-                            >
-                              <KTIcon iconName='eye' className='fs-3' />
-                            </Link>
+                            <>
+                              {/* <Link
+                                to={`/documents/review/${document._id}`}
+                                title='Review'
+                                className='btn  btn-bg-light btn-active-color-primary btn-color-muted btn-sm me-2 mb-2'
+                              >
+                                Load Review
+                              </Link> */}
+                              <button
+                                onClick={() => initailizeReviewSession(document._id)}
+                                title='Review'
+                                className='btn  btn-bg-light btn-active-color-primary btn-color-muted btn-sm me-2'
+                              >
+                                New Review
+                              </button>
+                            </>
                           )}
                           {currentUser?.roles.some((role: any) => role.name === 'Student') && (
                             <Link

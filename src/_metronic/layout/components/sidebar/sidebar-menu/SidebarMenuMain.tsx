@@ -61,6 +61,11 @@ const SidebarMenuMain = () => {
           {currentUser?.roles.some((role) => role.name === 'Supervisor') && (
             <>
               <SidebarMenuItem to='/documents/assigned' title='Assigned' hasBullet={true} />
+              <SidebarMenuItem
+                to='/documents/reviewSessions'
+                title='Review Sessions'
+                hasBullet={true}
+              />
             </>
           )}
           {currentUser?.roles.some(
