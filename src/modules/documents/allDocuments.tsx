@@ -1,15 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import {PageTitle} from '../../_metronic/layout/core'
 import type {PageLink} from '../../_metronic/layout/core'
-import {KTIcon} from '../../_metronic/helpers'
 import get from '../../lib/get'
 import {useSelector} from 'react-redux'
-import {RootState} from '../../redux/store'
-import User from '../../types/User'
-import FormatDate from '../../utils/FormatDate'
 import TDocument from '../../types/Document'
-import {Spinner} from '../../components/Spinner'
-import {Link, useNavigate} from 'react-router-dom'
 import {selectAuth} from '../../redux/selectors/auth'
 import AssignDocument from '../users/components/assignDocument'
 import DocumentTable from '../../components/documentTable'
@@ -38,26 +32,24 @@ const AllDocuments = () => {
   const handleClose = () => {
     assginDoc(null)
   }
-  const navigate = useNavigate()
-
-  const getDocuments = async () => {
-    setIsLoading(true)
-    try {
-      if (token) {
-        const RESPONSE = await get('documents', token)
-        setDocuments(RESPONSE.data)
-        setIsLoading(false)
-      }
-    } catch (error) {
-      setIsLoading(false)
-      setDocuments([])
-      console.log(error)
-    }
-  }
 
   useEffect(() => {
+    const getDocuments = async () => {
+      setIsLoading(true)
+      try {
+        if (token) {
+          const RESPONSE = await get('documents', token)
+          setDocuments(RESPONSE.data)
+          setIsLoading(false)
+        }
+      } catch (error) {
+        setIsLoading(false)
+        setDocuments([])
+        console.log(error)
+      }
+    }
     getDocuments()
-  }, [])
+  }, [token])
 
   return (
     <>

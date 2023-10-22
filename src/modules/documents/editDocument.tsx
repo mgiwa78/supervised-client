@@ -1,18 +1,12 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useParams} from 'react-router-dom'
 import {Spinner} from '../../components/Spinner'
 import {PageLink, PageTitle} from '../../_metronic/layout/core'
 import get from '../../lib/get'
-import {useDispatch, useSelector} from 'react-redux'
+import {useSelector} from 'react-redux'
 import {selectAuth} from '../../redux/selectors/auth'
-import {selectDocumentForEdit} from '../../redux/selectors/document'
-import {setDocForEdit} from '../../redux/slice/documentSlice'
 import TDocument from '../../types/Document'
-import * as Yup from 'yup'
 import 'quill/dist/quill.snow.css' // Import Quill styles
-import {useFormik} from 'formik'
-import post from '../../lib/post'
-import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import Quill from 'quill'
 import put from '../../lib/put'
@@ -23,14 +17,10 @@ const EditDocument = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(false)
 
-  const editorRef = useRef<HTMLDivElement | null>(null)
   const [quill, setQuill] = useState<Quill | null>(null)
 
   const [document, setDocument] = useState<TDocument | null>(null)
   const [content, setContent] = useState<any>('')
-  const dispatch = useDispatch()
-
-  const doc = useSelector(selectDocumentForEdit)
   const editdocumentsBreadcrumbs: Array<PageLink> = [
     {
       title: 'Documents',
@@ -46,64 +36,33 @@ const EditDocument = () => {
     },
   ]
 
-  const getDocument = async () => {
-    setIsLoading(true)
-    try {
-      if (token) {
-        const RESPONSE = await get(`documents/${documentID}`, token)
-        setDocument(RESPONSE.data)
-        console.log(RESPONSE.data)
-
-        // dispatch(setDocForEdit({document: RESPONSE.data}))
-
-        setIsLoading(false)
-      }
-    } catch (error) {
-      setIsLoading(false)
-      setDocument(null)
-      console.log(error)
-    }
-  }
-
   useEffect(() => {
     // dispatch(setDocForEdit({document: null}))
-    getDocument()
 
-    // if (doc) {
-    //   setDocument(doc)
-    //   setContent(doc.content)
-    //   setIsLoading(false)
-    // }
-  }, [])
+    const getDocument = async () => {
+      setIsLoading(true)
+      try {
+        if (token) {
+          const RESPONSE = await get(`documents/${documentID}`, token)
+          setDocument(RESPONSE.data)
+          console.log(RESPONSE.data)
+
+          // dispatch(setDocForEdit({document: RESPONSE.data}))
+
+          setIsLoading(false)
+        }
+      } catch (error) {
+        setIsLoading(false)
+        setDocument(null)
+        console.log(error)
+      }
+    }
+    getDocument()
+  }, [token, documentID])
+
   useEffect(() => {
     if (document) if (quill) quill.clipboard.dangerouslyPasteHTML(document.content)
-  }, [document])
-
-  const formats = [
-    'header',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'blockquote',
-    'list',
-    'bullet',
-    'indent',
-    'link',
-    'image',
-  ]
-  const modules = {
-    toolbar: [
-      [{header: [1, 2, false]}],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{list: 'ordered'}, {list: 'bullet'}, {indent: '-1'}, {indent: '+1'}],
-      ['link', 'image'],
-      ['clean'],
-    ],
-  }
-  // dispatch(setDocForEdit({document: null}))
-  // const editor = reactQuillRef.getEditor()
-  // const unprivilegedEditor = reactQuillRef.makeUnprivilegedEditor(editor)
+  }, [document, quill])
 
   useEffect(() => {
     if (!quill) {
@@ -136,7 +95,7 @@ const EditDocument = () => {
 
       setQuill(editor)
     }
-  }, [])
+  }, [quill])
 
   const handleDocumentUpdate = async (e: any) => {
     e.preventDefault()

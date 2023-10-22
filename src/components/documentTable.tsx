@@ -1,11 +1,11 @@
 import React from 'react'
 import TDocument from '../types/Document'
 import {KTIcon} from '../_metronic/helpers'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
 import {Spinner} from './Spinner'
 import FormatDate from '../utils/FormatDate'
 import {useSelector} from 'react-redux'
-import {selectAuth, selectToken, selectUser} from '../redux/selectors/auth'
+import { selectToken, selectUser} from '../redux/selectors/auth'
 import post from '../lib/post'
 type Props = {
   isLoading: boolean
@@ -17,11 +17,13 @@ const DocumentTable = ({title, documents, isLoading, assginDoc}: Props) => {
   const currentUser = useSelector(selectUser)
   const token = useSelector(selectToken)
 
+  const path = useLocation()
+  console.log(path)
   const navigate = useNavigate()
 
   const initailizeReviewSession = async (doc: string) => {
     const RESPONSE: any = await post(
-      'reviewSession/initialize',
+      'reviewSessions/initialize',
       {
         supervisorId: currentUser._id,
         documentId: doc,
@@ -49,42 +51,44 @@ const DocumentTable = ({title, documents, isLoading, assginDoc}: Props) => {
               Total documents {documents && documents.length}
             </span>
           </h3>
-          <div className='card-toolbar'>
-            <button
-              type='button'
-              className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
-              data-kt-menu-trigger='click'
-              data-kt-menu-placement='bottom-end'
-              data-kt-menu-flip='top-end'
-            >
-              <KTIcon iconName='category' className='fs-2' />
-            </button>
-            <div
-              className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
-              data-kt-menu='true'
-            >
-              <div className='menu-item px-3'>
-                <div className='menu-content fs-6 text-dark fw-bold px-3 py-4'>Quick Actions</div>
-              </div>
-              <div className='separator mb-3 opacity-75'></div>
+          {path.pathname !== '/documents/assigned' && (
+            <div className='card-toolbar'>
+              <button
+                type='button'
+                className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
+                data-kt-menu-trigger='click'
+                data-kt-menu-placement='bottom-end'
+                data-kt-menu-flip='top-end'
+              >
+                <KTIcon iconName='category' className='fs-2' />
+              </button>
+              <div
+                className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
+                data-kt-menu='true'
+              >
+                <div className='menu-item px-3'>
+                  <div className='menu-content fs-6 text-dark fw-bold px-3 py-4'>Quick Actions</div>
+                </div>
+                <div className='separator mb-3 opacity-75'></div>
 
-              <div className='menu-item px-3'>
-                <Link to='/documents/create' className='menu-link px-3'>
-                  New Document
-                </Link>
-              </div>
+                <div className='menu-item px-3'>
+                  <Link to='/documents/create' className='menu-link px-3'>
+                    New Document
+                  </Link>
+                </div>
 
-              <div className='separator mt-3 opacity-75'></div>
+                <div className='separator mt-3 opacity-75'></div>
 
-              {/* <div className='menu-item px-3'>
+                {/* <div className='menu-item px-3'>
                 <div className='menu-content px-3 py-3'>
                   <a className='btn btn-primary btn-sm px-4' href='#'>
                     Generate Reports
                   </a>
                 </div>
               </div> */}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <div className='card-body py-3'>
           <div className='table-responsive'>

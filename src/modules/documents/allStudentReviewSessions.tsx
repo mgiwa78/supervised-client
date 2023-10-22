@@ -7,6 +7,7 @@ import {selectAuth, selectToken, selectUser} from '../../redux/selectors/auth'
 import AssignDocument from '../users/components/assignDocument'
 import ReviewsTable from '../../components/ReviewsTable'
 import TReviewSessions from '../../types/ReviewSessions'
+import {useParams} from 'react-router-dom'
 
 const documentsBreadcrumbs: Array<PageLink> = [
   {
@@ -23,8 +24,9 @@ const documentsBreadcrumbs: Array<PageLink> = [
   },
 ]
 
-const AllReviewsSessions = () => {
+const AllStudentReviewSessions = () => {
   const token = useSelector(selectToken)
+
   const user = useSelector(selectUser)
   const [reviewSessions, setReviewSessions] = useState<Array<TReviewSessions>>([])
   const [doc, assginDoc] = useState<null | string>(null)
@@ -38,11 +40,9 @@ const AllReviewsSessions = () => {
     const getDocuments = async () => {
       setIsLoading(true)
 
-      const path = user?.roles.some((role) => role.name === 'Student') ? '' : 'reviewSessions'
-
       try {
         if (token) {
-          const RESPONSE = await get('reviewSessions', token)
+          const RESPONSE = await get(`reviewSessions/student/myReview`, token)
           setReviewSessions(RESPONSE.data)
           setIsLoading(false)
         }
@@ -58,9 +58,9 @@ const AllReviewsSessions = () => {
 
   return (
     <>
-      <PageTitle breadcrumbs={documentsBreadcrumbs}>All Review Sessions </PageTitle>
+      <PageTitle breadcrumbs={documentsBreadcrumbs}>My Review Sessions </PageTitle>
       <ReviewsTable
-        title='All Review Sessions'
+        title='My Review Sessions'
         reviewSessions={reviewSessions}
         assginDoc={assginDoc}
         isLoading={isLoading}
@@ -70,4 +70,4 @@ const AllReviewsSessions = () => {
   )
 }
 
-export default AllReviewsSessions
+export default AllStudentReviewSessions

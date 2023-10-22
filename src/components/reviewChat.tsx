@@ -28,7 +28,7 @@ type Props = {
 
 const bufferMessages = defaultMessages
 
-const ReviewChat: FC<Props> = ({isDrawer = false, comments = [], setComments}) => {
+const ReviewChat: FC<Props> = ({isDrawer = true, comments = [], setComments}) => {
   const {reviewSessionId} = useParams()
   const user = useSelector(selectUser)
   const [isUserLoading, setIsUserLoading] = useState<boolean>(false)
@@ -88,192 +88,182 @@ const ReviewChat: FC<Props> = ({isDrawer = false, comments = [], setComments}) =
   }
 
   return (
-    <div
-      className='card-body px-0'
-      style={{height: '100%', position: 'relative'}}
-      id={isDrawer ? 'kt_drawer_chat_messenger_body' : 'kt_chat_messenger_body'}
-    >
-      <div
-        className={clsx('scroll-y', {'h-200px h-lg-auto': !isDrawer})}
-        style={{paddingRight: '20px', overflowX: 'hidden'}}
-        data-kt-element='messages'
-        data-kt-scroll='true'
-        data-kt-scroll-activate='{default: false, lg: true}'
-        data-kt-scroll-max-height='auto'
-        data-kt-scroll-dependencies={
-          isDrawer
-            ? '#kt_drawer_chat_messenger_header, #kt_drawer_chat_messenger_footer'
-            : '#kt_header, #kt_app_header, #kt_app_toolbar, #kt_toolbar, #kt_footer, #kt_app_footer, #kt_chat_messenger_header, #kt_chat_messenger_footer'
-        }
-        data-kt-scroll-wrappers={
-          isDrawer
-            ? '#kt_drawer_chat_messenger_body'
-            : '#kt_content, #kt_app_content, #kt_chat_messenger_body'
-        }
-        data-kt-scroll-offset={isDrawer ? '0px' : '5px'}
-      >
-        {comments.length > 0 ? (
-          comments.map((message, index) => {
-            console.log(message.author === user._id)
-            console.log(typeof message.author !== 'string' && message.author._id, user._id)
+    <>
+      <div style={{height: '100%', position: 'relative', overflow: 'hidden'}}>
+        <div
+          style={{
+            padding: '0px 10px 0px 10px ',
+            overflow: 'scroll',
+            maxHeight: '360px',
+            height: '360px',
+            paddingTop: '20px',
+          }}
+        >
+          {comments.length > 0 ? (
+            comments.map((message, index) => {
+              console.log(typeof message.author !== 'string' && message.author._id, user._id)
 
-            // const state = message.author === user._id ? 'info' : 'primary'
-            const state =
-              typeof message.author !== 'string'
-                ? message.author._id === user._id
+              // const state = message.author === user._id ? 'info' : 'primary'
+              const state =
+                typeof message.author !== 'string'
+                  ? message.author._id === user._id
+                    ? 'info'
+                    : 'primary'
+                  : message.author === user._id
                   ? 'info'
                   : 'primary'
-                : message.author === user._id
-                ? 'info'
-                : 'primary'
 
-            const templateAttr = {}
-            if (message.template) {
-              Object.defineProperty(templateAttr, 'data-kt-element', {
-                value: `template-${message.author === user._id}`,
-              })
-            }
-            const contentClass = `${isDrawer ? '' : 'd-flex'} justify-content-${
-              message.author === user._id ? 'start' : 'end'
-            } mb-10`
-            return (
-              <div
-                key={`message${index}`}
-                className={clsx('d-flex', contentClass, 'mb-10', {'d-none': message.template})}
-                {...templateAttr}
-              >
+              const templateAttr = {}
+              if (message.template) {
+                Object.defineProperty(templateAttr, 'data-kt-element', {
+                  value: `template-${message.author._id === user._id}`,
+                })
+              }
+              const contentClass = `${isDrawer ? '' : 'd-flex'} justify-content-${
+                state ? 'right' : 'end'
+              } mb-10`
+              return (
                 <div
-                  className={clsx(
-                    'd-flex flex-column align-items',
-                    `align-items-${message.author === user._id ? 'start' : 'end'}`
-                  )}
+                  key={`message${index}`}
+                  style={{width: '100%'}}
+                  className={clsx('d-flex', contentClass, 'mb-10')}
+                  {...templateAttr}
                 >
-                  <div className='d-flex align-items-center mb-2'>
-                    {typeof message.author !== 'string' && message.author._id === user._id ? (
-                      <>
-                        <div className='symbol  symbol-35px symbol-circle '>
-                          <img alt='Pic' src={toAbsoluteUrl(`/media/avatars/blank.png`)} />
-                        </div>
-                        <div className='ms-3'>
-                          <a
-                            href='#'
-                            className='fs-7 fw-bolder text-gray-900 text-hover-primary me-1'
-                          >
-                            {message.author.firstName}
-                            {message.author.lastName}
-                          </a>{' '}
-                          <br />
-                          <span className='text-muted fs-7 mb-1'>
-                            {' '}
-                            {FormatDate(message.createdAt)}
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className='me-3'>
-                          <span className='text-muted fs-7 mb-1'>{message.createdAt}</span>
-                          <a
-                            href='#'
-                            className='fs-5 fw-bolder text-gray-900 text-hover-primary ms-1'
-                          >
-                            You
-                          </a>
-                        </div>
-                        <div className='symbol  symbol-35px symbol-circle '>
-                          <img alt='Pic' src={toAbsoluteUrl(`/media/avatars/blank.png`)} />
-                        </div>
-                      </>
+                  <div
+                    style={{width: '100%'}}
+                    className={clsx(
+                      'd-flex flex-column align-items',
+                      `align-items-${message.author._id !== user._id ? 'start' : 'end'}`
                     )}
-                  </div>
-                  <div className='text-end'>
-                    <button
-                      type='button'
-                      onClick={() => handleCommentDelete(message._id)}
-                      className='btn btn-sm btn-icon btn-color-danger btn-active-light-danger mb-2'
-                      data-kt-menu-trigger='click'
-                      data-kt-menu-placement='bottom-end'
-                      data-kt-menu-flip='top-end'
-                      title='Delete'
-                    >
-                      <KTIcon iconName='trash' className='fs-2' />
-                    </button>{' '}
-                    <div
-                      className={clsx(
-                        'p-5 rounded',
-                        `bg-light-${state}`,
-                        'text-dark fw-bold mw-lg-400px',
-                        `text-${message.author === user._id ? 'start' : 'end'}`
+                  >
+                    <div className='d-flex align-items-center mb-2'>
+                      {message.author._id !== user._id ? (
+                        <>
+                          <div className='symbol  symbol-35px symbol-circle '>
+                            <img alt='Pic' src={toAbsoluteUrl(`/media/avatars/blank.png`)} />
+                          </div>
+                          <div className='ms-3'>
+                            <a
+                              href='#'
+                              className='fs-7 fw-bolder text-gray-900 text-hover-primary me-1'
+                            >
+                              {message.author.firstName + ' ' + message.author.lastName} {}
+                            </a>
+                            <br />
+                            <span className='text-muted fs-7 mb-1'>
+                              {FormatDate(message.createdAt)}
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className='me-3'>
+                            <a
+                              href='#'
+                              className='fs-5 fw-bolder text-gray-900 text-hover-primary ms-1'
+                            >
+                              You
+                            </a>
+                            <br />
+                            <span className='text-muted fs-7 mb-1'>
+                              {FormatDate(message.createdAt)}
+                            </span>
+                          </div>
+
+                          <div className='symbol  symbol-35px symbol-circle '>
+                            <img alt='Pic' src={toAbsoluteUrl(`/media/avatars/blank.png`)} />
+                          </div>
+                        </>
                       )}
-                      data-kt-element='message-text'
-                      dangerouslySetInnerHTML={{__html: message.content}}
-                    ></div>
+                    </div>
+                    <div className='text-end'>
+                      {message.author._id === user._id ? (
+                        <button
+                          type='button'
+                          onClick={() => handleCommentDelete(message._id)}
+                          className='btn btn-sm btn-icon btn-color-danger btn-active-light-danger mb-2'
+                          data-kt-menu-trigger='click'
+                          data-kt-menu-placement='bottom-end'
+                          data-kt-menu-flip='top-end'
+                          title='Delete'
+                        >
+                          <KTIcon iconName='trash' className='fs-2' />
+                        </button>
+                      ) : (
+                        ''
+                      )}
+                      <div
+                        className={clsx(
+                          'p-5 rounded',
+                          `bg-light-${state}`,
+                          'text-dark fw-bold mw-lg-400px',
+                          `text-${message.author._id !== user._id ? 'start' : 'end'}`
+                        )}
+                        data-kt-element='message-text'
+                        dangerouslySetInnerHTML={{__html: message.content}}
+                      ></div>
+                    </div>
                   </div>
                 </div>
+              )
+            })
+          ) : (
+            <div className='row'>
+              <div className='col-12 text-center text-bolder text-muted' style={{height: '100%'}}>
+                No Comments
               </div>
-            )
-          })
-        ) : (
-          <div className='row'>
-            <div className='col-12 text-center text-bolder text-muted' style={{height: '100%'}}>
-              No Comments
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+        <div className='card-footer pt-4' style={{overflowY: 'scroll', maxHeight: '150px'}}>
+          <textarea
+            className='form-control form-control-flush mb-3'
+            rows={1}
+            data-kt-element='input'
+            placeholder='Type a message'
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onKeyDown={onEnterPress}
+          ></textarea>
 
-      <div
-        className='card-footer pt-4'
-        id={isDrawer ? 'kt_drawer_chat_messenger_footer' : 'kt_chat_messenger_footer'}
-        style={{position: 'absolute', bottom: '10px', width: '90%', right: 0}}
-      >
-        <textarea
-          className='form-control form-control-flush mb-3'
-          rows={1}
-          data-kt-element='input'
-          placeholder='Type a message'
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          onKeyDown={onEnterPress}
-        ></textarea>
-
-        <div className='d-flex flex-stack'>
-          <div className='d-flex align-items-center me-2'>
+          <div className='d-flex flex-stack'>
+            <div className='d-flex align-items-center me-2'>
+              <button
+                className='btn btn-sm btn-icon btn-active-light-primary me-1'
+                type='button'
+                data-bs-toggle='tooltip'
+                title='Coming soon'
+              >
+                <i className='bi bi-paperclip fs-3'></i>
+              </button>
+              <button
+                className='btn btn-sm btn-icon btn-active-light-primary me-1'
+                type='button'
+                data-bs-toggle='tooltip'
+                title='Coming soon'
+              >
+                <i className='bi bi-upload fs-3'></i>
+              </button>
+            </div>
             <button
-              className='btn btn-sm btn-icon btn-active-light-primary me-1'
+              className='btn btn-primary'
               type='button'
-              data-bs-toggle='tooltip'
-              title='Coming soon'
+              data-kt-element='send'
+              onClick={sendMessage}
+              disabled={isUserLoading}
             >
-              <i className='bi bi-paperclip fs-3'></i>
-            </button>
-            <button
-              className='btn btn-sm btn-icon btn-active-light-primary me-1'
-              type='button'
-              data-bs-toggle='tooltip'
-              title='Coming soon'
-            >
-              <i className='bi bi-upload fs-3'></i>
+              <span className='indicator-label'>Submit</span>
+              {isUserLoading && (
+                <span className='indicator-progress'>
+                  Please wait...{' '}
+                  <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                </span>
+              )}
             </button>
           </div>
-          <button
-            className='btn btn-primary'
-            type='button'
-            data-kt-element='send'
-            onClick={sendMessage}
-            disabled={isUserLoading}
-          >
-            <span className='indicator-label'>Submit</span>
-            {isUserLoading && (
-              <span className='indicator-progress'>
-                Please wait...{' '}
-                <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-              </span>
-            )}
-          </button>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

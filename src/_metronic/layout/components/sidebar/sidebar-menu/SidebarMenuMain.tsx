@@ -55,19 +55,25 @@ const SidebarMenuMain = () => {
           {currentUser?.roles.some((role) => role.name === 'Student') && (
             <>
               <SidebarMenuItem to='/documents/my' title='My Documents' hasBullet={true} />
-              <SidebarMenuItem to='/documents/create' title='Create' hasBullet={true} />
+              <SidebarMenuItem to='/documents/create' title='Create' hasBullet={true} />{' '}
+              <SidebarMenuItem
+                to='/documents/reviewSessions/student'
+                title='Review Sessions'
+                hasBullet={true}
+              />
             </>
           )}
           {currentUser?.roles.some((role) => role.name === 'Supervisor') && (
             <>
               <SidebarMenuItem to='/documents/assigned' title='Assigned' hasBullet={true} />
               <SidebarMenuItem
-                to='/documents/reviewSessions'
+                to='/documents/reviewSessions/supervisor'
                 title='Review Sessions'
                 hasBullet={true}
               />
             </>
           )}
+
           {currentUser?.roles.some(
             (role) => role.name === 'Superadmin' || role.name === 'Faculty Admin'
           ) && (

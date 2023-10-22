@@ -20,6 +20,7 @@ import AssignedDocument from '../modules/documents/assignedDocuments'
 import ReviewDocument from '../modules/documents/reviewDocument'
 import ReviewsTable from '../components/ReviewsTable'
 import AllReviewsSessions from '../modules/documents/allReviewSessions'
+import AllStudentReviewSessions from '../modules/documents/allStudentReviewSessions'
 
 const PrivateRoutes = () => {
   return (
@@ -53,7 +54,10 @@ const PrivateRoutes = () => {
           <Route path='all' element={<AllDocuments />} />
           <Route path='create' element={<CreateDocuments />} />
           <Route path='assigned' element={<AssignedDocument />} />
-          <Route path='reviewSessions' element={<AllReviewsSessions />} />
+          <Route path='reviewSessions'>
+            <Route path='supervisor' element={<AllReviewsSessions />} />
+            <Route path='student' element={<AllStudentReviewSessions />} />
+          </Route>
           <Route path='edit/:documentID' element={<EditDocument />} />
         </Route>
 

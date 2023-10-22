@@ -1,12 +1,9 @@
 import React from 'react'
-import TDocument from '../types/Document'
-import {KTIcon} from '../_metronic/helpers'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link} from 'react-router-dom'
 import {Spinner} from './Spinner'
 import FormatDate from '../utils/FormatDate'
 import {useSelector} from 'react-redux'
-import {selectAuth, selectToken, selectUser} from '../redux/selectors/auth'
-import post from '../lib/post'
+import {selectUser} from '../redux/selectors/auth'
 import TReviewSessions from '../types/ReviewSessions'
 type Props = {
   isLoading: boolean
@@ -14,30 +11,8 @@ type Props = {
   assginDoc: Function
   reviewSessions: Array<TReviewSessions>
 }
-const ReviewsTable = ({title, reviewSessions, isLoading, assginDoc}: Props) => {
+const ReviewsTable = ({title, reviewSessions, isLoading}: Props) => {
   const currentUser = useSelector(selectUser)
-  const token = useSelector(selectToken)
-
-  const navigate = useNavigate()
-
-  const initailizeReviewSession = async (doc: string) => {
-    const RESPONSE: any = await post(
-      'reviewSessions/initialize',
-      {
-        supervisorId: currentUser._id,
-        documentId: doc,
-      },
-      token,
-      true,
-      'Document Created'
-    )
-
-    const reviewData = RESPONSE.data
-
-    if (reviewData._id) {
-      navigate(`/documents/review/${reviewData._id}`)
-    }
-  }
 
   return (
     <div>
@@ -103,6 +78,8 @@ const ReviewsTable = ({title, reviewSessions, isLoading, assginDoc}: Props) => {
                     </div>
                   </th>
                   <th className='min-w-150px'>Session Id</th>
+                  <th className='min-w-140px'>Author</th>
+                  <th className='min-w-140px'>Document Title</th>
                   <th className='min-w-140px'>Created At</th>
                   <th className='min-w-140px'>Last Updated</th>
                   <th className='min-w-100px text-center'>Actions</th>
@@ -111,14 +88,14 @@ const ReviewsTable = ({title, reviewSessions, isLoading, assginDoc}: Props) => {
               <tbody>
                 {isLoading && (
                   <tr>
-                    <td colSpan={6}>
+                    <td colSpan={7}>
                       <Spinner />
                     </td>
                   </tr>
                 )}
                 {!isLoading && reviewSessions.length === 0 && (
                   <tr>
-                    <td className='py-10 text-center text-bolder text-muted' colSpan={6}>
+                    <td className='py-10 text-center text-bolder text-muted' colSpan={7}>
                       No Review Sessions
                     </td>
                   </tr>
@@ -141,6 +118,23 @@ const ReviewsTable = ({title, reviewSessions, isLoading, assginDoc}: Props) => {
                             {reviewSessions._id}
                           </span>
                         </td>
+
+                        <td>
+                          <span className='text-dark fw-bold text-hover-primary fs-6'>
+                            {typeof reviewSessions.document !== 'string'
+                              ? reviewSessions.document.author.lastName +
+                                ' ' +
+                                reviewSessions.document.author.firstName
+                              : 'No Document'}
+                          </span>
+                        </td>
+                        <td>
+                          <span className='text-dark fw-bold text-hover-primary fs-6'>
+                            {typeof reviewSessions.document !== 'string'
+                              ? reviewSessions.document.title
+                              : 'No Document'}
+                          </span>
+                        </td>
                         <td>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
                             {FormatDate(reviewSessions.createdAt)}
@@ -152,7 +146,7 @@ const ReviewsTable = ({title, reviewSessions, isLoading, assginDoc}: Props) => {
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'></span>
                         </td> */}
                         <td className='text-dark fw-bold text-hover-primary fs-6'>
-                          {reviewSessions.updatedAt}
+                          {FormatDate(reviewSessions.updatedAt)}
                         </td>
 
                         <td className='text-end'>
@@ -167,7 +161,9 @@ const ReviewsTable = ({title, reviewSessions, isLoading, assginDoc}: Props) => {
                               <KTIcon iconName='switch' className='fs-3' />
                             </span>
                           )} */}
-                          {currentUser?.roles.some((role: any) => role.name === 'Supervisor') && (
+                          {currentUser?.roles.some(
+                            (role: any) => role.name === 'Supervisor' || role.name === 'Student'
+                          ) && (
                             <>
                               <Link
                                 to={`/documents/review/${reviewSessions._id}`}

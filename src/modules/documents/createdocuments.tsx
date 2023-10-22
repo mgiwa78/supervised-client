@@ -1,23 +1,13 @@
 import React, {useState} from 'react'
 import {PageLink, PageTitle} from '../../_metronic/layout/core'
-import {useDispatch, useSelector} from 'react-redux'
-import {Link, useNavigate} from 'react-router-dom'
+import {useSelector} from 'react-redux'
 import {useFormik} from 'formik'
 import * as Yup from 'yup'
-import {login} from '../auth/core/_requests'
-import {loginSuccess, logout} from '../../redux/slice/authSlice'
 import clsx from 'clsx'
 import post from '../../lib/post'
 import {selectAuth} from '../../redux/selectors/auth'
-import {ids} from 'webpack'
 import mammoth from 'mammoth'
 import {useDropzone} from 'react-dropzone'
-import {toAbsoluteUrl} from '../../_metronic/helpers'
-
-import {UploadResult, getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage'
-import {storage} from '../../utils/firbase'
-// import {handleFileUpload2} from '../../utils/HandleFileUpload'
-// import {convertDocxToHtml, handleFileUpload} from '../../utils/HandleFileUpload'
 
 const rolesBreadcrumbs: Array<PageLink> = [
   {
@@ -61,25 +51,39 @@ const CreateDocuments = () => {
   const [loading, setLoading] = useState(false)
 
   const onDrop = async (acceptedFiles: Array<File>) => {
-    let urlPath
     const file = acceptedFiles[0]
-
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
     console.log(file)
+
     if (file) {
       console.log(file)
-      const AB = await file.arrayBuffer()
 
-      const result = await mammoth.convertToHtml({arrayBuffer: AB})
+      if (
+        file.type === 'application/msword' ||
+        file.type === 'application/docx' ||
+        file.type === 'application/doc' ||
+        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ) {
+        const AB = await file.arrayBuffer()
 
-      setFileContent(result.value)
-      formik.values.content = result.value
-      setFileUploadState('complete')
+        const result = await mammoth.convertToHtml({arrayBuffer: AB})
+
+        setFileContent(result.value)
+        formik.values.content = result.value
+        setFileUploadState('complete')
+      }
     }
   }
 
   const {getRootProps, getInputProps, acceptedFiles} = useDropzone({
     onDrop,
+    accept: {
+      'application/*': [
+        'vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.docx',
+        '.doc',
+        '.pdf',
+      ],
+    },
   })
   const files = acceptedFiles.map((file: any) => <li key={file.path}>{file.path}</li>)
 
@@ -197,7 +201,6 @@ const CreateDocuments = () => {
                   <option value='blank'>blank</option>
                   <option value='insert_content'>content</option>
                   <option value='upload_word_file'>Upload Word file</option>
-                  <option value='upload_pdf_file'>Upload pdf file</option>
                 </select>
                 {formik.touched.defualtTemplate && formik.errors.defualtTemplate && (
                   <div className='fv-plugins-message-container'>
@@ -209,6 +212,8 @@ const CreateDocuments = () => {
               </div>
               {formik.values.defualtTemplate === 'insert_content' ? (
                 <div className='col-6'>
+                  <label className='form-label fs-6 fw-bold text-muted'>Content</label>
+
                   <textarea
                     placeholder='Select Content'
                     {...formik.getFieldProps('content')}

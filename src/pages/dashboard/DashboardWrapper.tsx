@@ -3,25 +3,12 @@ import {FC} from 'react'
 import {useIntl} from 'react-intl'
 import {toAbsoluteUrl} from '../../_metronic/helpers'
 import {PageTitle} from '../../_metronic/layout/core'
-import {
-  ListsWidget2,
-  ListsWidget3,
-  ListsWidget4,
-  ListsWidget6,
-  TablesWidget5,
-  TablesWidget10,
-  MixedWidget8,
-  CardsWidget7,
-  CardsWidget17,
-  CardsWidget20,
-  ListsWidget26,
-  EngageWidget10,
-} from '../../_metronic/partials/widgets'
+
 import {useSelector} from 'react-redux'
 import {selectAuth} from '../../redux/selectors/auth'
 import {AdminDashboard} from '../../modules/dashboard/AdminDashboard'
-import {InstructorDashboard} from '../../modules/dashboard/InstructorDashboard'
 import {StudentDashboard} from '../../modules/dashboard/StudentDashboard'
+import {SupervisorDashboard} from '../../modules/dashboard/InstructorDashboard'
 
 const DashboardPage: FC = () => {
   const auth = useSelector(selectAuth)
@@ -30,7 +17,7 @@ const DashboardPage: FC = () => {
     <>
       {auth.user?.roles.some((role) => role.name === 'Superadmin') ? <AdminDashboard /> : ''}
       {auth.user?.roles.some((role) => role.name === 'Student') ? <StudentDashboard /> : ''}
-      {auth.user?.roles.some((role) => role.name === 'Supervisor') ? <InstructorDashboard /> : ''}
+      {auth.user?.roles.some((role) => role.name === 'Supervisor') ? <SupervisorDashboard /> : ''}
     </>
   )
 }

@@ -1,23 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import {FC, useEffect, useState} from 'react'
-import {useIntl} from 'react-intl'
-import {toAbsoluteUrl} from '../../_metronic/helpers'
 import {PageLink, PageTitle} from '../../_metronic/layout/core'
-import {
-  ListsWidget2,
-  ListsWidget3,
-  ListsWidget4,
-  ListsWidget6,
-  TablesWidget5,
-  TablesWidget10,
-  MixedWidget8,
-  CardsWidget7,
-  CardsWidget17,
-  CardsWidget20,
-  ListsWidget26,
-  EngageWidget10,
-  MixedWidget9,
-} from '../../_metronic/partials/widgets'
 import {UserAnalytics} from './components/UserAnalytics'
 import {useSelector} from 'react-redux'
 import {selectAuth} from '../../redux/selectors/auth'
@@ -33,20 +16,19 @@ const Dashboard: FC = () => {
   const [roles, setRoles] = useState<Array<RolesData>>([])
   const {token} = useSelector(selectAuth)
 
-  const getRoles = async () => {
-    try {
-      if (token) {
-        const RESPONSE = await get('roles/withUsers', token)
-        setRoles(RESPONSE.data)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   useEffect(() => {
+    const getRoles = async () => {
+      try {
+        if (token) {
+          const RESPONSE = await get('roles/withUsers', token)
+          setRoles(RESPONSE.data)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
     getRoles()
-  }, [])
+  }, [token])
 
   return (
     <>
@@ -82,7 +64,7 @@ const AdminDashboard: FC = () => {
   ]
   return (
     <>
-      <PageTitle breadcrumbs={adminDahboard}>Admin Dahboard</PageTitle>
+      <PageTitle breadcrumbs={adminDahboard}>Admin Dashboard</PageTitle>
       <Dashboard />
     </>
   )
