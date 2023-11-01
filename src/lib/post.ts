@@ -79,7 +79,7 @@ const post = async (
     }
     if (error.response.status === 500) {
       return MySwal.fire({
-        text: 'Internal server error',
+        text: error.response.data.message || `Internal server error`,
         icon: 'error',
         buttonsStyling: false,
         confirmButtonText: 'Ok!',

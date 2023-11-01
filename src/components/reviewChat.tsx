@@ -19,17 +19,19 @@ import {bottom} from '@popperjs/core'
 import FormatDate from '../utils/FormatDate'
 import axios from 'axios'
 import deleteReq from '../lib/delete'
+import get from '../lib/get'
 
 type Props = {
   isDrawer?: boolean
   comments: Array<TComment>
   setComments: Function
+  reviewID: string
 }
 
 const bufferMessages = defaultMessages
 
-const ReviewChat: FC<Props> = ({isDrawer = true, comments = [], setComments}) => {
-  const {reviewSessionId} = useParams()
+const ReviewChat: FC<Props> = ({isDrawer = true, comments = [], setComments, reviewID}) => {
+  const {documentId} = useParams()
   const user = useSelector(selectUser)
   const [isUserLoading, setIsUserLoading] = useState<boolean>(false)
   const [chatUpdateFlag, toggleChatUpdateFlat] = useState<boolean>(false)
@@ -59,12 +61,7 @@ const ReviewChat: FC<Props> = ({isDrawer = true, comments = [], setComments}) =>
       //   setMessages(() => bufferMessages)
       //   toggleChatUpdateFlat((flag) => !flag)
       // }, 1000)
-      const RESPONSE = await post(
-        `reviewSessions/comment/${reviewSessionId}`,
-        {comment},
-        token,
-        false
-      )
+      const RESPONSE = await post(`reviewSessions/comment/${reviewID}`, {comment}, token, false)
       setComment('')
 
       if (RESPONSE.data) {
@@ -75,8 +72,14 @@ const ReviewChat: FC<Props> = ({isDrawer = true, comments = [], setComments}) =>
       setIsUserLoading(false)
     }
   }
+
   const handleCommentDelete = async (commentID: string) => {
-    const RESPONSE = await deleteReq(`comments/${commentID}`, token, true, 'Comment deleted')
+    const RESPONSE = await deleteReq(
+      `comments/${commentID}/${reviewID}`,
+      token,
+      true,
+      'Comment deleted'
+    )
     setComments(RESPONSE.data)
   }
 

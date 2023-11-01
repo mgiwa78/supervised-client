@@ -24,7 +24,7 @@ import {ReviewChat} from '../../components/reviewChat'
 
 const ReviewDocument = () => {
   const {token} = useSelector(selectAuth)
-  const {reviewSessionId} = useParams()
+  const {documentId} = useParams()
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
@@ -35,12 +35,6 @@ const ReviewDocument = () => {
   const [assignedDocument, setAssignedDocument] = useState<TDocument | null>(null)
   const [content, setContent] = useState<any>('')
   const [quill, setQuill] = useState<Quill | null>(null)
-
-  const getReviewdata = async () => {
-    const RESPONSE = await get(`reviewSessions/${reviewSessionId}`, token)
-    setContent(RESPONSE.data.content)
-    setReviewData(RESPONSE.data)
-  }
 
   const editorRef = useRef<HTMLDivElement | null>(null)
 
@@ -86,8 +80,15 @@ const ReviewDocument = () => {
   }, [reviewData])
 
   useEffect(() => {
+    const getReviewdata = async () => {
+      const RESPONSE = await get(`reviewSessions/byDocument/${documentId}`, token)
+      if (RESPONSE?.data) {
+        setContent(RESPONSE.data.content)
+        setReviewData(RESPONSE.data)
+      }
+    }
     getReviewdata()
-  }, [])
+  }, [documentId, token])
 
   // dispatch(setDocForEdit({document: null}))
   // const editor = reactQuillRef.getEditor()
@@ -177,7 +178,11 @@ const ReviewDocument = () => {
           <div className='col-12 col-lg-4'>
             <div className='card p-0'>
               <div className='card-body p-0' style={{height: '494px', overflow: 'scroll'}}>
-                <ReviewChat comments={comments} setComments={setComments} />
+                <ReviewChat
+                  reviewID={reviewData?._id}
+                  comments={comments}
+                  setComments={setComments}
+                />
               </div>
             </div>
           </div>

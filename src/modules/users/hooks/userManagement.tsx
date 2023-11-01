@@ -126,6 +126,7 @@ const useUserManagement = () => {
   const updateUser = async (newUserData: any, token: any) => {
     // UpdateLoading(true)
     const RESPONSE = await put(`users/${newUserData._id}`, newUserData, token, true, 'User Updated')
+    
     // UpdateLoading(false)
     // dispatch({type: 'UpdateUser', payload: newUserData})
   }

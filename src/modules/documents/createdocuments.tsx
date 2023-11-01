@@ -85,6 +85,7 @@ const CreateDocuments = () => {
       ],
     },
   })
+
   const files = acceptedFiles.map((file: any) => <li key={file.path}>{file.path}</li>)
 
   const formik = useFormik({
@@ -117,6 +118,7 @@ const CreateDocuments = () => {
       }
     },
   })
+
   // const handleFormatChange = (e: any) => {
   //   console.log(e.target.value)
   //   if (e.target.value !== 'upload_word_file') {

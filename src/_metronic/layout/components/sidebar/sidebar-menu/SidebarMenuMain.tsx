@@ -45,32 +45,16 @@ const SidebarMenuMain = () => {
           </>
         </SidebarMenuItemWithSub>
       )}
-      <SidebarMenuItemWithSub
-        to='/documents'
-        title='Documents'
-        fontIcon='bi-people'
-        icon='document'
-      >
+      <SidebarMenuItemWithSub to='/project' title='Projects' fontIcon='bi-people' icon='document'>
         <>
           {currentUser?.roles.some((role) => role.name === 'Student') && (
             <>
-              <SidebarMenuItem to='/documents/my' title='My Documents' hasBullet={true} />
-              <SidebarMenuItem to='/documents/create' title='Create' hasBullet={true} />{' '}
-              <SidebarMenuItem
-                to='/documents/reviewSessions/student'
-                title='Review Sessions'
-                hasBullet={true}
-              />
+              <SidebarMenuItem to='/project/my' title='All' hasBullet={true} />
             </>
           )}
           {currentUser?.roles.some((role) => role.name === 'Supervisor') && (
             <>
-              <SidebarMenuItem to='/documents/assigned' title='Assigned' hasBullet={true} />
-              <SidebarMenuItem
-                to='/documents/reviewSessions/supervisor'
-                title='Review Sessions'
-                hasBullet={true}
-              />
+              <SidebarMenuItem to='/project/assigned' title='Projects' hasBullet={true} />
             </>
           )}
 
@@ -78,11 +62,36 @@ const SidebarMenuMain = () => {
             (role) => role.name === 'Superadmin' || role.name === 'Faculty Admin'
           ) && (
             <>
-              <SidebarMenuItem to='/documents/all' title='All Documents' hasBullet={true} />
+              <SidebarMenuItem to='/project/all' title='All' hasBullet={true} />
+              <SidebarMenuItem
+                to='/facultyadmin/proposals/submitted'
+                title='Proposals'
+                hasBullet={true}
+              />
             </>
           )}
         </>
       </SidebarMenuItemWithSub>
+      <SidebarMenuItemWithSub to='/proposal' title='Proposal' fontIcon='bi-people' icon='document'>
+        <>
+          {currentUser?.roles.some((role) => role.name === 'Student') && (
+            <>
+              <SidebarMenuItem to='/proposals/my' title='All' hasBullet={true} />
+              <SidebarMenuItem to='/proposals/submit' title='Submit ' hasBullet={true} />
+            </>
+          )}
+        </>
+      </SidebarMenuItemWithSub>
+      {currentUser?.roles.some((role) => role.name === 'Supervisor') && (
+        <>
+          <SidebarMenuItem
+            to='/students/assignedStudents'
+            title='Students'
+            fontIcon='bi-profile'
+            icon='people'
+          ></SidebarMenuItem>
+        </>
+      )}
     </>
   )
 }

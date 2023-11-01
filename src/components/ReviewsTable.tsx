@@ -166,7 +166,7 @@ const ReviewsTable = ({title, reviewSessions, isLoading}: Props) => {
                           ) && (
                             <>
                               <Link
-                                to={`/documents/review/${reviewSessions._id}`}
+                                to={`/project/review/${reviewSessions._id}`}
                                 title='Review'
                                 className='btn  btn-bg-light btn-active-color-primary btn-color-muted btn-sm me-2 mb-2'
                               >

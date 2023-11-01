@@ -1,5 +1,5 @@
 import {FC} from 'react'
-import {Link} from 'react-router-dom'
+import {Link, useLocation} from 'react-router-dom'
 import {toAbsoluteUrl} from '../../../_metronic/helpers'
 
 const Error404: FC = () => {

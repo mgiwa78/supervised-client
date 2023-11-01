@@ -1,15 +1,10 @@
 import {Route, Routes, Navigate} from 'react-router-dom'
 import CreateDocuments from '../../modules/documents/createdocuments'
+import AssignedStudents from '../../components/assignedStudents'
+import AllAssignedStudents from '../../pages/users/assignedStudents'
 
 const StudentRoutes = () => {
-  return (
-    <Routes>
-      <Route path='/users'>
-        <Route index element={<Navigate to='/users/all' />} />
-        <Route path='all' element={<CreateDocuments />} />
-      </Route>
-    </Routes>
-  )
+  return <Routes></Routes>
 }
 
 export {StudentRoutes}
