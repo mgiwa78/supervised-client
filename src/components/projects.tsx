@@ -3,7 +3,7 @@ import {KTIcon, toAbsoluteUrl} from '../_metronic/helpers'
 import {Link, useParams} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 import {TProject} from '../types/Project'
-import {selectAuth} from '../redux/selectors/auth'
+import {selectAuth, selectUser} from '../redux/selectors/auth'
 import get from '../lib/get'
 import {Spinner} from '../components/Spinner'
 import {PageLink, PageTitle} from '../_metronic/layout/core'
@@ -16,6 +16,7 @@ type Props = {
 }
 
 const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
+  const currentUser = useSelector(selectUser)
   return (
     <div>
       <div className='row g-6 g-xl-9'>
@@ -29,7 +30,10 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
               return (
                 <div className='col-md-6 col-xl-4'>
                   <Link
-                    to={`/students/assignedStudents/${student}/project/${project._id}`}
+                    to={
+                      currentUser?.roles.some((role) => role.name === 'Supervisor') &&
+                      `/students/assignedStudents/${student}/project/${project._id}`
+                    }
                     className='card border-hover-primary'
                   >
                     <div className='card-header border-0 pt-9'>
@@ -60,7 +64,7 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
                           <div className='fw-semibold text-gray-400'>Created Date</div>
                         </div>
                         <div className='border border-gray-300 border-dashed rounded min-w-120px py-3 px-4 mb-3'>
-                          <div className='fs-6 text-gray-800 fw-bold'>0</div>
+                          <div className='fs-6 text-gray-800 fw-bold'>{project.files.length}</div>
                           <div className='fw-semibold text-gray-400'>Documents</div>
                         </div>
                       </div>

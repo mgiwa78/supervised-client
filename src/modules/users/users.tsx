@@ -10,10 +10,12 @@ import {UserEditModal} from './user-edit-modal/UserEditModal'
 import useUserManagement from './hooks/userManagement'
 import {UsersListLoading} from './user-edit-modal/loading/UsersListLoading'
 import FormatDate from '../../utils/FormatDate'
+import {selectAuth, selectUser as selectUserState} from '../../redux/selectors/auth'
 
 const Users = ({role = 'Users'}) => {
   const token = useSelector((state: RootState) => state.auth.token)
   // const [users, setUsers] = useState([])
+  const currentUser = useSelector(selectUserState)
   const {
     setItemIdForUpdate,
     updateUser,
@@ -32,7 +34,7 @@ const Users = ({role = 'Users'}) => {
 
   useEffect(() => {
     if (!users && token) {
-      getUsers(token)
+      getUsers(token, role)
     }
   }, [])
 
@@ -109,7 +111,9 @@ const Users = ({role = 'Users'}) => {
                   {/* <th className='min-w-120px'>Roles</th> */}
                   <th className='min-w-120px'>Created At</th>
                   <th className='min-w-120px'>Role</th>
-                  <th className='min-w-100px text-end'>Actions</th>
+                  {currentUser?.roles.some((role) => role.name === 'Super Admin') && (
+                    <th className='min-w-100px text-end'>Actions</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -158,26 +162,28 @@ const Users = ({role = 'Users'}) => {
                             </span>
                           ))}
                         </td>
-                        <td className='text-end'>
-                          {/* <a
+                        {currentUser?.roles.some((role) => role.name === 'Super Admin') && (
+                          <td className='text-end'>
+                            {/* <a
                               href='#'
                               className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1'
                             >
                               <KTIcon iconName='switch' className='fs-3' />
                             </a> */}
-                          <span
-                            onClick={() => handleModalUpdate(user)}
-                            className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 mr-1'
-                          >
-                            <KTIcon iconName='pencil' className='fs-3' />
-                          </span>
-                          {/* <a
+                            <span
+                              onClick={() => handleModalUpdate(user)}
+                              className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 mr-1'
+                            >
+                              <KTIcon iconName='pencil' className='fs-3' />
+                            </span>
+                            {/* <a
                               href='#'
                               className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm'
                             >
                               <KTIcon iconName='trash' className='fs-3' />
                             </a> */}
-                        </td>
+                          </td>
+                        )}
                       </tr>
                     )
                   })

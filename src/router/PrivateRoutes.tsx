@@ -40,6 +40,7 @@ import MyProposals from '../modules/proposal/myProposals'
 import SubmittedProposals from '../modules/proposal/submittedProposals'
 
 import Proposal from '../components/viewProposal/Proposal'
+import AllStudents from '../pages/users/students'
 
 const PrivateRoutes = () => {
   const location = useLocation()
@@ -70,6 +71,7 @@ const PrivateRoutes = () => {
           <Route path='roles' element={<Roles />} />
           <Route path='permissions' element={<Permissions />} />
           <Route path='supervisors' element={<AllSupervisors />} />
+          <Route path='students' element={<AllStudents />} />
         </Route>
 
         <Route path='/proposals'>

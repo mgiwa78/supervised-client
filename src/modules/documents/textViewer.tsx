@@ -3,27 +3,26 @@ import WebViewer, {WebViewerInstance} from '@pdftron/webviewer'
 
 import React, {useEffect, useRef, useState} from 'react'
 import {useParams} from 'react-router-dom'
-import get from '../../lib/get'
-const path = require('path')
-console.log(process.env.PUBLIC_URL)
+import ErrorHandler from '../../utils/ErrorHandler'
 
 type PropeType = {
   file?: any
 }
 
 const FileViewer = ({file}: PropeType) => {
+  console.log(file)
+
   const viewer = useRef(null)
   const {fileId} = useParams()
   const [viewerInstance, setViewerInstance] = useState<WebViewerInstance>()
   const [fileData, setfileData] = useState(null)
 
-  // useEffect(() => {
-  //   if (viewerInstance && fileData) {
-  //     viewerInstance.docViewer.loadDocument(fileData.path)
-  //   }
-  // }, [fileData, viewerInstance])
   const tex = async () => {
-    await viewerInstance.Core.documentViewer.loadDocument(file.path)
+    try {
+      await viewerInstance.Core.documentViewer.loadDocument(file.path)
+    } catch (error) {
+      ErrorHandler(error)
+    }
   }
   useEffect(() => {
     if (!viewerInstance) {
@@ -33,7 +32,7 @@ const FileViewer = ({file}: PropeType) => {
             path: `/${process.env.PUBLIC_URL}`,
             licenseKey:
               'demo:1698486675363:7cf3a92e030000000091ed1a992aaf72330e0db5c8390e69e84c9f38cf',
-            initialDoc: '',
+            initialDoc: file ? file.path : '',
           },
           viewer.current
         ).then(function (instance: any) {

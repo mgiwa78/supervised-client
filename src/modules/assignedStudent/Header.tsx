@@ -18,7 +18,6 @@ type propType = {
 
 const StudentOverviewHeader = ({setViewDoc}: propType) => {
   const token = useSelector(selectToken)
-  const location = useLocation()
   const {studentId, projectId} = useParams()
 
   const assignedStudentBreadcrumbs: Array<PageLink> = [
@@ -194,7 +193,6 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
                               border: 'none',
                             }}
                             onClick={() => {
-                              console.log(file)
                               setViewDoc(file)
                             }}
                             className='fs-6 text-gray-700 text-hover-primary fw-bold mb-1 left'

@@ -40,11 +40,19 @@ const SidebarMenuMain = () => {
               </>
             )}
             {currentUser?.roles.some((role) => role.name === 'Faculty Admin') && (
-              <SidebarMenuItem to='/users/supervisors' title='Supervisors' hasBullet={true} />
+              <>
+                <SidebarMenuItem to='/users/supervisors' title='Supervisors' hasBullet={true} />
+                <SidebarMenuItem to='/users/students' title='Students' hasBullet={true} />
+              </>
             )}
           </>
         </SidebarMenuItemWithSub>
       )}
+      {/* //
+
+Projects
+
+//   */}
       <SidebarMenuItemWithSub to='/project' title='Projects' fontIcon='bi-people' icon='document'>
         <>
           {currentUser?.roles.some((role) => role.name === 'Student') && (
@@ -63,25 +71,40 @@ const SidebarMenuMain = () => {
           ) && (
             <>
               <SidebarMenuItem to='/project/all' title='All' hasBullet={true} />
-              <SidebarMenuItem
-                to='/facultyadmin/proposals/submitted'
-                title='Proposals'
-                hasBullet={true}
-              />
             </>
           )}
         </>
       </SidebarMenuItemWithSub>
-      <SidebarMenuItemWithSub to='/proposal' title='Proposal' fontIcon='bi-people' icon='document'>
-        <>
-          {currentUser?.roles.some((role) => role.name === 'Student') && (
-            <>
-              <SidebarMenuItem to='/proposals/my' title='All' hasBullet={true} />
-              <SidebarMenuItem to='/proposals/submit' title='Submit ' hasBullet={true} />
-            </>
-          )}
-        </>
-      </SidebarMenuItemWithSub>
+      {/* //
+
+Proposal
+
+//   */}
+      {currentUser?.roles.some(
+        (role) => role.name === 'Superadmin' || role.name === 'Faculty Admin'
+      ) && (
+        <SidebarMenuItemWithSub to='/proposal' title='Proposal' fontIcon='bi-people' icon='file'>
+          <>
+            {currentUser?.roles.some((role) => role.name === 'Student') && (
+              <>
+                <SidebarMenuItem to='/proposals/my' title='All' hasBullet={true} />
+                <SidebarMenuItem to='/proposals/submit' title='Submit ' hasBullet={true} />
+              </>
+            )}
+            {currentUser?.roles.some(
+              (role) => role.name === 'Superadmin' || role.name === 'Faculty Admin'
+            ) && (
+              <>
+                <SidebarMenuItem
+                  to='/facultyadmin/proposals/submitted'
+                  title='All'
+                  hasBullet={true}
+                />
+              </>
+            )}
+          </>
+        </SidebarMenuItemWithSub>
+      )}
       {currentUser?.roles.some((role) => role.name === 'Supervisor') && (
         <>
           <SidebarMenuItem

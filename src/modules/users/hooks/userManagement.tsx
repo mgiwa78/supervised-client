@@ -109,24 +109,26 @@ const useUserManagement = () => {
   const selectUser = async (userData: any) => {
     dispatch({type: 'selectUser', payload: userData})
   }
-  const getUsers = async (token: string) => {
+  const getUsers = async (token: string, role: string) => {
+    let RESPONSE
     if (token) {
-      const RESPONSE = await get('users', token)
+      if (role) {
+        RESPONSE = await get(`users/${role}`, token)
+      } else {
+        RESPONSE = await get('users', token)
+      }
       dispatch({type: 'UpdateLoading', payload: true})
-      // const RESPONSE2 = await get('roles', token)
+
       if (RESPONSE) {
         dispatch({type: 'UpdateLoading', payload: false})
         return dispatch({type: 'getUsers', payload: RESPONSE.data})
       }
-
-      // setUsers(RESPONSE.data)
-      // setRoles(RESPONSE2.data)
     }
   }
   const updateUser = async (newUserData: any, token: any) => {
     // UpdateLoading(true)
     const RESPONSE = await put(`users/${newUserData._id}`, newUserData, token, true, 'User Updated')
-    
+
     // UpdateLoading(false)
     // dispatch({type: 'UpdateUser', payload: newUserData})
   }

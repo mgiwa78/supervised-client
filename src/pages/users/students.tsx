@@ -17,8 +17,8 @@ const usersBreadcrumbs: Array<PageLink> = [
     isActive: false,
   },
 ]
-const AllSupervisors = (props: Props) => {
-  const role: string = 'supervisors'
+const AllStudents = (props: Props) => {
+  const role: string = 'students'
   return (
     <div>
       <PageTitle breadcrumbs={usersBreadcrumbs}>{role + ' list'}</PageTitle>
@@ -27,4 +27,4 @@ const AllSupervisors = (props: Props) => {
   )
 }
 
-export default AllSupervisors
+export default AllStudents

@@ -60,7 +60,6 @@ const ViewProposalDoc = ({file, handleClose}: Proptype) => {
     validationSchema: loginSchema,
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setLoading(true)
-      console.log('asdda')
       try {
         console.log(values)
         const RESPONSE: any = await post('documents', values, token, true, 'Document Created')
@@ -124,7 +123,7 @@ const ViewProposalDoc = ({file, handleClose}: Proptype) => {
               </div>
 
               <div className='card-body py-1'>
-                <FileViewer />
+                <FileViewer file={file} />
                 {/* <form
                   className='form w-100 h-100'
                   onSubmit={formik.handleSubmit}
