@@ -22,7 +22,7 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
       <div className='row g-6 g-xl-9'>
         {isLoading && <Spinner />}
         <>
-          {projects ? (
+          {projects.length > 0 ? (
             projects.map((project) => {
               const student =
                 typeof project.student === 'object' ? project.student._id : project.student
@@ -40,31 +40,31 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
                       <div className='card-title m-0'>
                         <div className='symbol symbol-50px w-50px bg-light'>
                           <span className='symbol-label bg-secondary text-inverse-secondary fw-bold'>
-                            {project.title[0]}
+                            {project?.title[0]}
                           </span>
                         </div>
                       </div>
                       <div className='card-toolbar'>
                         <span className='badge badge-light-warning fw-bold me-auto px-4 py-3'>
-                          {project.status || 'Pending Review'}
+                          {project?.status || 'Pending Review'}
                         </span>
                       </div>
                     </div>
 
                     <div className='card-body p-9'>
-                      <div className='fs-3 fw-bold text-dark'>{project.title}</div>
+                      <div className='fs-3 fw-bold text-dark'>{project?.title}</div>
                       <p className='text-gray-400 fw-semibold fs-5 mt-1 mb-7'>
-                        {project.description}
+                        {project?.description}
                       </p>
                       <div className='d-flex flex-wrap mb-5'>
                         <div className='border border-gray-300 border-dashed rounded min-w-120px py-3 px-4 me-7 mb-3'>
                           <div className='fs-6 text-gray-800 fw-bold'>
-                            {project.createdAt ? FormatDate(project.createdAt) : '-----'}
+                            {project?.createdAt ? FormatDate(project?.createdAt) : '-----'}
                           </div>
                           <div className='fw-semibold text-gray-400'>Created Date</div>
                         </div>
                         <div className='border border-gray-300 border-dashed rounded min-w-120px py-3 px-4 mb-3'>
-                          <div className='fs-6 text-gray-800 fw-bold'>{project.files.length}</div>
+                          <div className='fs-6 text-gray-800 fw-bold'>{project?.files.length}</div>
                           <div className='fw-semibold text-gray-400'>Documents</div>
                         </div>
                       </div>

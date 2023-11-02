@@ -117,7 +117,15 @@ const Users = ({role = 'Users'}) => {
                 </tr>
               </thead>
               <tbody>
-                {isLoading ? <UsersListLoading /> : ''}
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={5}>
+                      <UsersListLoading />
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 {users ? (
                   users.map((user: User) => {
                     return (
@@ -191,7 +199,9 @@ const Users = ({role = 'Users'}) => {
                   <tr>
                     <td colSpan={7}>
                       <div className='fv-row d-flex justify-content-center mh-300px'>
-                        <div className='h-40px w-40px spinner-border spinner-border-sm align-middle ms-2'></div>
+                        <div className='fv-row d-flex justify-content-center mh-300px fs-5 py-20'>
+                          <span className='text-muted'> No Users</span>
+                        </div>
                       </div>
                     </td>
                   </tr>

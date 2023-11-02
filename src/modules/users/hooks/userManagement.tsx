@@ -110,16 +110,20 @@ const useUserManagement = () => {
   const getUsers = async (token: string, role: string) => {
     let RESPONSE
     if (token) {
-      if (role && role !== 'Users') {
-        RESPONSE = await get(`users/${role}`, token)
-      } else {
-        RESPONSE = await get('users', token)
-      }
-      dispatch({type: 'UpdateLoading', payload: true})
+      try {
+        dispatch({type: 'UpdateLoading', payload: true})
+        if (role && role !== 'Users') {
+          RESPONSE = await get(`users/${role}`, token)
+        } else {
+          RESPONSE = await get('users', token)
+        }
 
-      if (RESPONSE) {
+        if (RESPONSE) {
+          dispatch({type: 'getUsers', payload: RESPONSE.data})
+        }
         dispatch({type: 'UpdateLoading', payload: false})
-        return dispatch({type: 'getUsers', payload: RESPONSE.data})
+      } catch (error) {
+        console.log(error)
       }
     }
   }

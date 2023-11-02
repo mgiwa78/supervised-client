@@ -90,14 +90,15 @@ const ProjectDocuments = ({project}: any) => {
               tabIndex={-1}
               aria-hidden='true'
               data-kt-initialized='1'
+              defaultValue={'Backlog'}
             >
-              <option value='Active' selected={true} data-select2-id='select2-data-11-t490'>
+              <option value='Active' data-select2-id='select2-data-11-t490'>
                 Approved
               </option>
               <option value='Approved' data-select2-id='select2-data-200-ki3t'>
                 In Progress
               </option>
-              <option value='Declined' data-select2-id='select2-data-201-pnvr'>
+              <option value='Backlog' data-select2-id='select2-data-201-pnvr'>
                 Backlog
               </option>
             </select>
@@ -111,7 +112,7 @@ const ProjectDocuments = ({project}: any) => {
       </div>
       <div className='row g-6 g-xl-9 mb-6 mb-xl-9'>
         {project.files?.map((document: any) => (
-          <div className='col-md-6 col-lg-4 col-xl-3'>
+          <div key={document._id} className='col-md-6 col-lg-4 col-xl-3'>
             <div className='card h-100' style={{position: 'relative'}}>
               <button
                 type='button'

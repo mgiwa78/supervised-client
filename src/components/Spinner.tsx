@@ -6,13 +6,23 @@ const Spinner = () => {
     color: '#7e8299',
     fontWeight: '500',
     margin: '0',
-    width: 'auto',
+    width: 'max-content',
     padding: '1rem 2rem',
-    top: 'calc(50% - 2rem)',
-    left: 'calc(50% - 4rem)',
   }
 
-  return <div style={{...styles, position: 'absolute', textAlign: 'center'}}> Loading...</div>
+  return (
+    <div
+      style={{
+        width: '100%',
+        display: 'flex',
+        padding: '50px 0',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <div style={{...styles, textAlign: 'center'}}> Loading...</div>
+    </div>
+  )
 }
 
 export {Spinner}

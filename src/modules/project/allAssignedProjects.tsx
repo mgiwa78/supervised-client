@@ -37,7 +37,9 @@ const AllAssignedProjects = () => {
       try {
         if (token) {
           const RESPONSE = await get(`projects/supervisor/assigned`, token)
-          setProjects(RESPONSE.data)
+          if (RESPONSE?.data) {
+            setProjects(RESPONSE.data)
+          }
           setIsLoading(false)
         }
       } catch (error) {

@@ -163,7 +163,9 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
                   <tr>
                     <td colSpan={7}>
                       <div className='fv-row d-flex justify-content-center mh-300px'>
-                        <span className='text-muted'> No Proposals</span>
+                        <div className='fv-row d-flex justify-content-center mh-300px fs-5 py-20'>
+                          <span className='text-muted'> No Proposals</span>
+                        </div>
                       </div>
                     </td>
                   </tr>

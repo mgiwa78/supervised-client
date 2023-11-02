@@ -38,58 +38,84 @@ const put = async (
     return RESPONSE.data
   } catch (error: any) {
     console.log(error)
+    switch (error.message) {
+      case 'Network Error':
+        MySwal.fire({
+          text: 'Network Error',
+          icon: 'error',
+          buttonsStyling: false,
+          confirmButtonText: 'CLose!',
+          heightAuto: false,
+          customClass: {
+            confirmButton: 'btn btn-danger',
+          },
+        }).then(() => {})
+        break
 
-    if (error.response.status === 401) {
-      return MySwal.fire({
-        text: 'Unauthorised',
-        icon: 'error',
-        buttonsStyling: false,
-        confirmButtonText: 'Ok!',
-        heightAuto: false,
-        customClass: {
-          confirmButton: 'btn btn-danger',
-        },
-      }).then(() => {})
+      default:
+        break
     }
-    if (error.response.status === 407) {
-      console.log('first')
-      return MySwal.fire({
-        text: 'Athentication Required',
-        icon: 'error',
-        buttonsStyling: false,
-        confirmButtonText: 'Ok!',
-        heightAuto: false,
-        customClass: {
-          confirmButton: 'btn btn-danger',
-        },
-      }).then(() => {
-        const dispatch = useDispatch()
-        dispatch(logout)
-      })
-    }
-    if (error.response.status === 403) {
-      return MySwal.fire({
-        text: 'Permission Denied',
-        icon: 'error',
-        buttonsStyling: false,
-        confirmButtonText: 'Ok!',
-        heightAuto: false,
-        customClass: {
-          confirmButton: 'btn btn-danger',
-        },
-      }).then(() => {})
-    }
-    if (error.response.status === 500) {
-      return MySwal.fire({
-        text: 'Internal server error',
-        icon: 'error',
-        buttonsStyling: false,
-        confirmButtonText: 'Ok!',
-        heightAuto: false,
-        customClass: {
-          confirmButton: 'btn btn-danger',
-        },
-      }).then(() => {})
+
+    switch (error.response?.status) {
+      case 401:
+        MySwal.fire({
+          text: 'Unauthorised',
+          icon: 'error',
+          buttonsStyling: false,
+          confirmButtonText: 'Ok!',
+          heightAuto: false,
+          customClass: {
+            confirmButton: 'btn btn-danger',
+          },
+        }).then(() => {})
+        break
+      case 407:
+        MySwal.fire({
+          text: 'Athentication Required',
+          icon: 'error',
+          buttonsStyling: false,
+          confirmButtonText: 'Ok!',
+          heightAuto: false,
+          customClass: {
+            confirmButton: 'btn btn-danger',
+          },
+        }).then(() => {})
+        break
+      case 403:
+        MySwal.fire({
+          text: 'Permission Denied',
+          icon: 'error',
+          buttonsStyling: false,
+          confirmButtonText: 'Ok!',
+          heightAuto: false,
+          customClass: {
+            confirmButton: 'btn btn-danger',
+          },
+        }).then(() => {})
+        break
+      case 409:
+        MySwal.fire({
+          text: 'Permission Denied',
+          icon: 'error',
+          buttonsStyling: false,
+          confirmButtonText: 'Ok!',
+          heightAuto: false,
+          customClass: {
+            confirmButton: 'btn btn-danger',
+          },
+        }).then(() => {})
+        break
+      case 500:
+        MySwal.fire({
+          text: 'Internal server error',
+          icon: 'error',
+          buttonsStyling: false,
+          confirmButtonText: 'Ok!',
+          heightAuto: false,
+          customClass: {
+            confirmButton: 'btn btn-danger',
+          },
+        }).then(() => {})
     }
 
     if (error.response?.data.errors) {

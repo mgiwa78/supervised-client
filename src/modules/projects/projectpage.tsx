@@ -9,28 +9,68 @@ import {TProject} from '../../types/Project'
 import get from '../../lib/get'
 import ProjectOverview from './projectOverview'
 import ProjectDocuments from './projectDocuments'
+import {Spinner} from '../../components/Spinner'
+import {PageLink, PageTitle} from '../../_metronic/layout/core'
 
 const ProjectPage = () => {
   const token = useSelector(selectToken)
   const location = useLocation()
   const {projectId} = useParams()
 
-  console.log(projectId)
   const [project, setProject] = useState<TProject>()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [page, setPage] = useState<'documents' | 'overview'>('overview')
 
   useEffect(() => {
     const getStudent = async () => {
+      setIsLoading(true)
       const RESPONSE = await get(`projects/${projectId}`, token)
-      setProject(RESPONSE.data)
+
+      if (RESPONSE?.data) {
+        setProject(RESPONSE.data)
+      }
+      setIsLoading(false)
     }
     getStudent()
   }, [token, projectId])
+
+  const projectPageBreadcrumbs: Array<PageLink> = [
+    {
+      title: 'View Project',
+      path: '/projects/:projectId',
+      isSeparator: false,
+      isActive: false,
+    },
+    {
+      title: '',
+      path: '',
+      isSeparator: true,
+      isActive: false,
+    },
+  ]
+
   return (
     <>
-      <ProjectHeader setPage={setPage} page={page} />
-      {page === 'overview' && <ProjectOverview />}
-      {page === 'documents' && <ProjectDocuments project={project} />}
+      <PageTitle breadcrumbs={projectPageBreadcrumbs}>View Project</PageTitle>
+      {isLoading && (
+        <div className='fv-row d-flex justify-content-center mh-300px'>
+          <div className='h-40px w-40px spinner-border spinner-border-sm align-middle ms-2'></div>
+        </div>
+      )}
+
+      {project && !isLoading && (
+        <>
+          <ProjectHeader project={project} setPage={setPage} page={page} />
+          {page === 'overview' && <ProjectOverview />}
+          {page === 'documents' && <ProjectDocuments project={project} />}
+        </>
+      )}
+
+      {!isLoading && !project && (
+        <div className='fv-row d-flex justify-content-center mh-300px fs-5 py-20'>
+          <span className='text-muted'>Invalid Project</span>
+        </div>
+      )}
     </>
   )
 }

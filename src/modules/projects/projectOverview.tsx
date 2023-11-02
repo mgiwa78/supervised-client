@@ -4,7 +4,6 @@ import {useLocation} from 'react-router-dom'
 const ProjectOverview = () => {
   const location = useLocation()
 
-  console.log(location)
   return (
     <div className='col-lg-6'>
       <div className='card  h-lg-100'>

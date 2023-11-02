@@ -11,25 +11,22 @@ import {Spinner} from '../../components/Spinner'
 import {TProject} from '../../types/Project'
 import FormatDate from '../../utils/FormatDate'
 
-const ProjectHeader = ({setPage, page}: any) => {
+const ProjectHeader = ({setPage, page, project}: any) => {
   const token = useSelector(selectToken)
   const location = useLocation()
   const {projectId} = useParams()
 
-  console.log(projectId)
-  const [project, setProject] = useState<TProject>()
-
-  useEffect(() => {
-    const getStudent = async () => {
-      const RESPONSE = await get(`projects/${projectId}`, token)
-      setProject(RESPONSE.data)
-    }
-    getStudent()
-  }, [token, projectId])
+  // useEffect(() => {
+  //   const getStudent = async () => {
+  //     const RESPONSE = await get(`projects/${projectId}`, token)
+  //     setProject(RESPONSE.data)
+  //   }
+  //   getStudent()
+  // }, [token, projectId])
 
   return (
     <div className='card mb-5 mb-xl-10'>
-      {project ? (
+      {project && (
         <div className='card-body pt-9 pb-0'>
           <div className='d-flex flex-wrap flex-sm-nowrap mb-6'>
             <div className='d-flex flex-center flex-shrink-0 bg-light rounded w-100px h-100px w-lg-150px h-lg-150px me-7 mb-4'>
@@ -122,8 +119,6 @@ const ProjectHeader = ({setPage, page}: any) => {
             </li>
           </ul>
         </div>
-      ) : (
-        <Spinner />
       )}
     </div>
   )

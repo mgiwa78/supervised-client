@@ -64,18 +64,17 @@ const MyProjects = () => {
               tabIndex={-1}
               aria-hidden='true'
               data-kt-initialized='1'
+              defaultValue={'Backlog'}
             >
-              <option value='Active' selected={true} data-select2-id='select2-data-11-54sr'>
+              <option value='Active' data-select2-id='select2-data-11-54sr'>
                 Active
               </option>
               <option value='Approved' data-select2-id='select2-data-124-qeyn'>
                 In Progress
               </option>
-              <option value='Declined' data-select2-id='select2-data-125-s4iz'>
-                To Do
-              </option>
-              <option value='In Progress' data-select2-id='select2-data-126-ag7y'>
-                Completed
+
+              <option value='Backlog' data-select2-id='select2-data-126-ag7y'>
+                Backlog
               </option>
             </select>
           </div>
