@@ -81,7 +81,7 @@ Proposal
 
 //   */}
       {currentUser?.roles.some(
-        (role) => role.name === 'Superadmin' || role.name === 'Faculty Admin'
+        (role) => role.name === 'Student' || role.name === 'Faculty Admin'
       ) && (
         <SidebarMenuItemWithSub to='/proposal' title='Proposal' fontIcon='bi-people' icon='file'>
           <>
@@ -91,9 +91,7 @@ Proposal
                 <SidebarMenuItem to='/proposals/submit' title='Submit ' hasBullet={true} />
               </>
             )}
-            {currentUser?.roles.some(
-              (role) => role.name === 'Superadmin' || role.name === 'Faculty Admin'
-            ) && (
+            {currentUser?.roles.some((role) => role.name === 'Faculty Admin') && (
               <>
                 <SidebarMenuItem
                   to='/facultyadmin/proposals/submitted'

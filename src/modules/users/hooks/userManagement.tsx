@@ -100,8 +100,6 @@ const useUserManagement = () => {
 
   const createUser = async (newUserData: any, token: any) => {
     const RESPONSE = await post(`users`, newUserData, token, true, 'User Updated')
-
-    // dispatch({type: 'CreateUser', payload: values})
   }
 
   const getUserById = (id: any) => dispatch({type: 'getUserById', payload: id})
@@ -112,7 +110,7 @@ const useUserManagement = () => {
   const getUsers = async (token: string, role: string) => {
     let RESPONSE
     if (token) {
-      if (role) {
+      if (role && role !== 'Users') {
         RESPONSE = await get(`users/${role}`, token)
       } else {
         RESPONSE = await get('users', token)
