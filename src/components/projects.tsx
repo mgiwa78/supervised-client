@@ -20,9 +20,8 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
   return (
     <div>
       <div className='row g-6 g-xl-9'>
-        {isLoading && <Spinner />}
         <>
-          {projects.length > 0 ? (
+          {projects.length > 0 &&
             projects.map((project) => {
               const student =
                 typeof project.student === 'object' ? project.student._id : project.student
@@ -72,8 +71,8 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
                   </Link>
                 </div>
               )
-            })
-          ) : (
+            })}
+          {!projects && isLoading && (
             <div className='fv-row d-flex justify-content-center mh-300px'>
               <div className='h-40px w-40px spinner-border spinner-border-sm align-middle ms-2'></div>
             </div>
