@@ -33,7 +33,7 @@ const post = async (
         customClass: {
           confirmButton: 'btn btn-danger',
         },
-      }).then(() => {})
+      })
     return RESPONSE.data
   } catch (error: any) {
     console.log(error)

@@ -23,6 +23,7 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
         <>
           {projects.length > 0 &&
             projects.map((project) => {
+              if (!project) return ''
               const student =
                 typeof project.student === 'object' ? project.student._id : project.student
 
@@ -44,8 +45,10 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
                         </div>
                       </div>
                       <div className='card-toolbar'>
-                        <span className='badge badge-light-warning fw-bold me-auto px-4 py-3'>
-                          {project?.status || 'Pending Review'}
+                        <span
+                          className={`badge badge-light-${project?.status?.color} fw-bold me-auto px-4 py-3`}
+                        >
+                          {project?.status?.title}
                         </span>
                       </div>
                     </div>

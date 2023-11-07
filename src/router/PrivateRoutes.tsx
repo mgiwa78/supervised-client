@@ -41,6 +41,7 @@ import SubmittedProposals from '../modules/proposal/submittedProposals'
 
 import Proposal from '../components/viewProposal/Proposal'
 import AllStudents from '../pages/users/students'
+import Workflow from '../pages/workflow/workflow'
 
 const PrivateRoutes = () => {
   const location = useLocation()
@@ -110,6 +111,7 @@ const PrivateRoutes = () => {
           </Route>
         </Route>
 
+        <Route path='workflow' element={<Workflow />} />
         <Route path='students'>
           {/* <Route path='users'>
             <Route index element={<Navigate to='/users/all' />} />

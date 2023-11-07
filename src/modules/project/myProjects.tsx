@@ -96,8 +96,10 @@ const MyProjects = () => {
                       </div>
                     </div>
                     <div className='card-toolbar'>
-                      <span className='badge badge-light-warning fw-bold me-auto px-4 py-3'>
-                        {project.status || 'Pending Review'}
+                      <span
+                        className={`badge badge-light-${project?.status?.color} fw-bold me-auto px-4 py-3`}
+                      >
+                        {project?.status?.title}
                       </span>
                     </div>
                   </div>

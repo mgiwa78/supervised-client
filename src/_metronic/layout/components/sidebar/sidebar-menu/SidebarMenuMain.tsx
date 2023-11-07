@@ -71,6 +71,7 @@ Projects
           ) && (
             <>
               <SidebarMenuItem to='/project/all' title='All' hasBullet={true} />
+              <SidebarMenuItem to='/project/Create' title='Create' hasBullet={true} />
             </>
           )}
         </>
@@ -102,6 +103,9 @@ Proposal
             )}
           </>
         </SidebarMenuItemWithSub>
+      )}
+      {currentUser?.roles.some((role) => role.name === 'Faculty Admin') && (
+        <SidebarMenuItem to='/workflow' title='Workflow' fontIcon='bi-chart' icon='chart' />
       )}
       {currentUser?.roles.some((role) => role.name === 'Supervisor') && (
         <>

@@ -40,6 +40,7 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
   const [isLoading, setisLoading] = useState<boolean>(false)
 
   useEffect(() => {
+    setisLoading(true)
     const getStudent = async () => {
       setisLoading(true)
       const RESPONSE = await get(`users/${studentId}`, token)
@@ -52,16 +53,22 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
       if (RESPONSE?.data) setProject(RESPONSE.data)
     }
 
+    setisLoading(true)
     getStudent()
     getProject()
     setisLoading(false)
-  }, [token, studentId])
+  }, [token, studentId, projectId])
+
   return (
     <>
       <PageTitle breadcrumbs={assignedStudentBreadcrumbs}>All Documents </PageTitle>
       <div className='card mb-5 mb-xl-10 '>
-        {isLoading && <Spinner />}
-        {student && student._id ? (
+        {isLoading && (
+          <div className='fv-row d-flex justify-content-center mh-300px'>
+            <div className='h-40px w-40px spinner-border spinner-border-sm align-middle ms-2'></div>
+          </div>
+        )}
+        {student && student._id && (
           <div className='card-body'>
             <div className='row'>
               <div className='col-3'>
@@ -223,7 +230,8 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
               </div>
             </div>
           </div>
-        ) : (
+        )}
+        {!project && !isLoading && (
           <div className='fv-row d-flex justify-content-center mh-300px fs-5 py-20'>
             <span className='text-muted'> No Project</span>
           </div>

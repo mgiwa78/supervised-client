@@ -1,4 +1,5 @@
 import User from './User'
+import TWorkflow from './Workflow'
 
 export interface TProject {
   title: string
@@ -18,6 +19,6 @@ export interface TProject {
   resources: string[]
   ethicalConsiderations: string
   milestones: {name: string; date: Date}[]
-  status: 'Draft' | 'In Progress' | 'Pending Approval'
+  status: TWorkflow
   comments: string
 }
