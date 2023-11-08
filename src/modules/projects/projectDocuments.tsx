@@ -10,6 +10,7 @@ import * as swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import {TProject} from '../../types/Project'
 import FormatDate from '../../utils/FormatDate'
+import deleteReq from '../../lib/delete'
 
 const MySwal = withReactContent(swal.default)
 
@@ -37,8 +38,14 @@ const ProjectDocuments = ({project}: any) => {
   const [isDelete, setisDelete] = useState<boolean>(false)
   const [IsLoading, setIsLoading] = useState<boolean>(false)
   const [documents, setDocuments] = useState<Array<TDocument>>()
+
   const handleClose = () => {
     setIsOpen(false)
+  }
+
+  const deleteFile = async (file: any) => {
+    const RESPONSE = await deleteReq(`project/${projectId}/${file._id}`, token)
+    console.log(RESPONSE)
   }
 
   // useEffect(() => {

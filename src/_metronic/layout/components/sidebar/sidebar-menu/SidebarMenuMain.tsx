@@ -104,7 +104,7 @@ Proposal
           </>
         </SidebarMenuItemWithSub>
       )}
-      {currentUser?.roles.some((role) => role.name === 'Faculty Admin') && (
+      {currentUser?.roles.some((role) => role.name === 'Superadmin') && (
         <SidebarMenuItem to='/workflow' title='Workflow' fontIcon='bi-chart' icon='chart' />
       )}
       {currentUser?.roles.some((role) => role.name === 'Supervisor') && (

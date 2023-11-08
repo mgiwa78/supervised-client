@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -12,20 +11,22 @@
     <title>Supervised</title>
     <link rel="shortcut icon" href="%PUBLIC_URL%/media/logos/favicon.ico" />
     <link rel="stylesheet" id="layout-styles-anchor" href="%PUBLIC_URL%/splash-screen.css" />
+
+
   </head>
 
   <body id="kt_body" class="page-loading">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <!--begin::Theme mode setup on page load-->
     <script>
-      let themeMode = 'system'
+      let themeMode = 'dark'
 
       if (localStorage.getItem('kt_theme_mode_value')) {
         themeMode = localStorage.getItem('kt_theme_mode_value')
       }
 
       if (themeMode === 'system') {
-        themeMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        themeMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark'
       }
 
       document.documentElement.setAttribute('data-bs-theme', themeMode)
@@ -51,5 +52,6 @@
     <!--end::Loading markup-->
 
     <div id="root-modals"></div>
+
   </body>
 </html>

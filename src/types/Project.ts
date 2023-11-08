@@ -7,7 +7,10 @@ export interface TProject {
   createdAt: string
   description: string
   student: User
+  workflows: Array<TWorkflow>
   files: Array<{
+    _id: string
+    status: string
     name: string
     path: string
   }>

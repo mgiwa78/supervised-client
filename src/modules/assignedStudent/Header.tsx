@@ -112,122 +112,73 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
                   </div>
                 </div>
               </div>
-              <div className='col-3'>
-                <div className='d-flex flex-stack fs-4 py-3 px-2 bg-light-success'>
-                  <div
-                    className='fw-bold rotate cursor-pointer'
-                    data-bs-toggle='collapse'
-                    role='button'
-                    aria-expanded='false'
-                    data-bs-target='#kt_customer_view_details'
-                    aria-controls='kt_customer_view_details'
-                  >
-                    Approved
-                    <span className='ms-2 rotate-180'>
-                      <i className='ki-duotone ki-down fs-3'></i>
-                    </span>
-                  </div>
-                </div>
-                <div className='separator separator-dashed my-1'></div>
-                <div id='kt_customer_view_details' className='collapse show '>
-                  <li className='d-flex align-items-center py-2 ' style={{marginLeft: '20px'}}>
-                    <span
-                      style={{cursor: 'pointer'}}
-                      className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
+              {project?.workflows?.map((workflow) => (
+                <div className='col-3'>
+                  <div className={`d-flex flex-stack fs-4 py-3 px-2 bg-light-${workflow.color}`}>
+                    <div
+                      className='fw-bold rotate cursor-pointer'
+                      data-bs-toggle='collapse'
+                      role='button'
+                      aria-expanded='false'
+                      data-bs-target={`#${workflow._id}`}
+                      aria-controls={`${workflow._id}`}
                     >
-                      No Documents
-                    </span>
-                  </li>
-                </div>
-              </div>
-              <div className='col-3'>
-                <div className='d-flex flex-stack fs-4 py-3 px-2 bg-light-warning'>
-                  <div
-                    className='fw-bold rotate cursor-pointer'
-                    data-bs-toggle='collapse'
-                    role='button'
-                    aria-expanded='false'
-                    data-bs-target='#kt_projects_in_progress'
-                    aria-controls='kt_projects_in_progress'
-                  >
-                    In Progress
-                    <span className='ms-2 rotate-180'>
-                      <i className='ki-duotone ki-down fs-3'></i>
-                    </span>
+                      {workflow.title}
+                      <span className='ms-2 rotate-180'>
+                        <i className='ki-duotone ki-down fs-3'></i>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className='separator separator-dashed my-1'></div>
-                <div id='kt_projects_in_progress' className='collapse show'>
-                  <li className='d-flex align-items-center py-2 ' style={{marginLeft: '20px'}}>
-                    <span
-                      style={{cursor: 'pointer'}}
-                      className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
-                    >
-                      No Documents
-                    </span>
-                  </li>
-                </div>
-              </div>
-
-              <div className='col-3'>
-                <div className='d-flex flex-stack fs-4 py-3 px-2 bg-light-secondary'>
-                  <div
-                    className='fw-bold rotate cursor-pointer'
-                    data-bs-toggle='collapse'
-                    role='button'
-                    aria-expanded='false'
-                    data-bs-target='#kt_projects_in_backlog'
-                    aria-controls='kt_projects_in_backlog'
-                  >
-                    Backlog
-                    <span className='ms-2 rotate-180'>
-                      <i className='ki-duotone ki-down fs-3'></i>
-                    </span>
-                  </div>
-                </div>
-                <div className='separator separator-dashed my-1'></div>
-                <div
-                  id='kt_projects_in_backlog'
-                  style={{textAlign: 'left'}}
-                  className='collapse show'
-                >
-                  {project?.files && project.files.length > 0 ? (
-                    project.files.map((file, i) => {
-                      return (
-                        <li
-                          key={i}
-                          className='d-flex justify-content-between align-items-left py-2 '
-                          style={{marginLeft: '20px'}}
-                        >
-                          <button
-                            style={{
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                            }}
-                            onClick={() => {
-                              setViewDoc(file)
-                            }}
-                            className='fs-6 text-gray-700 text-hover-primary fw-bold mb-1 left'
-                          >
-                            <span className='bullet me-5'></span> {file.name}
-                          </button>
-                        </li>
-                      )
-                    })
-                  ) : (
+                  <div className='separator separator-dashed my-1'></div>
+                  <div id={`${workflow._id}`} className='collapse show '>
                     <li className='d-flex align-items-center py-2 ' style={{marginLeft: '20px'}}>
                       <span
                         style={{cursor: 'pointer'}}
                         className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
                       >
-                        No Documents
+                        {project?.files.filter((file) => file?.status === workflow?._id).length >
+                        0 ? (
+                          project?.files
+                            .filter((file) => file?.status === workflow?._id)
+                            .map((file) => (
+                              <li
+                                key={file._id}
+                                className='d-flex justify-content-between align-items-left  '
+                              >
+                                <button
+                                  style={{
+                                    textAlign: 'left',
+                                    cursor: 'pointer',
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                  }}
+                                  onClick={() => {
+                                    setViewDoc(file)
+                                  }}
+                                  className='fs-6 text-gray-700 text-hover-primary fw-bold mb-1 left'
+                                >
+                                  <span className='bullet me-5'></span> {file.name}
+                                </button>
+                              </li>
+                            ))
+                        ) : (
+                          <li
+                            className='d-flex align-items-center py-2 '
+                            style={{marginLeft: '20px'}}
+                          >
+                            <span
+                              style={{cursor: 'pointer'}}
+                              className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
+                            >
+                              No Documents
+                            </span>
+                          </li>
+                        )}
                       </span>
                     </li>
-                  )}
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         )}

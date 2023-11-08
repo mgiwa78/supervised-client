@@ -41,7 +41,7 @@ const EditWorkFlow = ({currentWorkflow}: PropTypes) => {
           {...values},
           token,
           true,
-          'Workflow Created'
+          'Workflow Updated'
         )
         if (1) {
           formik.values = initialValues
@@ -109,7 +109,6 @@ const EditWorkFlow = ({currentWorkflow}: PropTypes) => {
               </label>
               <input
                 type='text'
-                defaultValue={currentWorkflow.title}
                 className='form-control form-control-solid'
                 name='title'
                 {...formik.getFieldProps('title')}

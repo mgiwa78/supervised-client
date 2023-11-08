@@ -12,6 +12,7 @@ import post from '../../lib/post'
 import {useFormik} from 'formik'
 import * as Yup from 'yup'
 import put from '../../lib/put'
+import TWorkflow from '../../types/Workflow'
 
 const MySwal = withReactContent(swal.default)
 
@@ -30,45 +31,61 @@ const ProposalApproval = ({proposal}: PropTypes) => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isDelete, setisDelete] = useState<boolean>(false)
   const [IsLoading, setIsLoading] = useState<boolean>(false)
+  const [isdrpShow, setisdrpShow] = useState<boolean>(false)
+  // const [workflows, setWorkflows] = useState<Array<TWorkflow>>()
 
+  const [workflows, setWorkflows] = useState<Array<{title: string; _id: number}>>([])
+  const [selectedWorkflows, setSelectedWorkflows] = useState<Array<{title: string; _id: number}>>(
+    []
+  )
+
+  useEffect(() => {
+    const getWorkflows = async () => {
+      const RESPONSE = await get(`workflows`, token)
+      if (RESPONSE?.data) {
+        // setWorkflows(RESPONSE.data)
+        setWorkflows(RESPONSE.data)
+      }
+    }
+    getWorkflows()
+  }, [])
   const token = useSelector(selectToken)
 
-  const [tags, setTags] = useState([])
   const [inputValue, setInputValue] = useState('')
 
-  const handleInputChange = (e: any) => {
-    setInputValue(e.target.value)
+  // const handleInputKeyDown = (e: any) => {
+  //   if (e.key === 'Enter' && inputValue) {
+  //     setWorkflows([...tags, inputValue.trim()])
+  //     setInputValue('')
+  //   }
+  // }
+
+  const handleTagRemove = (tag: {title: string; _id: number}) => {
+    setSelectedWorkflows(selectedWorkflows.filter((t) => t._id !== tag._id))
   }
 
-  const handleInputKeyDown = (e: any) => {
-    if (e.key === 'Enter' && inputValue) {
-      setTags([...tags, inputValue.trim()])
-      setInputValue('')
-    }
+  const handleAdd = (tag: {title: string; _id: number}) => {
+    console.log(selectedWorkflows)
+    if (selectedWorkflows.find((e) => e._id === tag._id)) return
+    setSelectedWorkflows([...selectedWorkflows, tag])
+
+    console.log([...selectedWorkflows, tag])
   }
 
-  const handleTagRemove = (tag: any) => {
-    setTags(tags.filter((t) => t !== tag))
-  }
   const handleApprove = async () => {}
 
   const formik = useFormik({
     initialValues: {...proposal},
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setIsLoading(true)
-      console.log('asdda')
       try {
-        console.log(values)
-
         const RESPONSE: any = await post(
           'proposals/approve',
-          {...proposal},
+          {...proposal, workflows: workflows.map((e) => e._id)},
           token,
           true,
           'Project Approved'
         )
-
-        console.log(RESPONSE)
 
         setSubmitting(false)
         setIsLoading(false)
@@ -202,6 +219,85 @@ const ProposalApproval = ({proposal}: PropTypes) => {
               </div>
             </div>
             <div className='row mb-8'>
+              <div className='col-6'>
+                <div className='d-flex flex-column mb-8 fv-row'>
+                  <label className='d-flex align-items-center fs-6 fw-semibold mb-2'>
+                    <span>Workflows</span>
+                  </label>
+                  <div style={{position: 'relative'}}>
+                    <div
+                      onClick={() => setisdrpShow(!isdrpShow)}
+                      style={{minHeight: '80px', overflowX: 'scroll'}}
+                      className='form-control form-control-solid d-flex gap-5'
+                    >
+                      {selectedWorkflows?.map((workflow) => (
+                        <div
+                          className='btn btn-secondary d-flex gap-2 align-items-center'
+                          key={workflow.title}
+                        >
+                          {workflow.title}
+                          <div
+                            className=' btn-active-icon-danger'
+                            data-kt-users-modal-action='close'
+                            onClick={() => handleTagRemove(workflow)}
+                            style={{cursor: 'pointer'}}
+                          >
+                            <KTIcon iconName='cross' className='fs-1' />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {isdrpShow && (
+                      <div
+                        style={{
+                          top: '80px',
+                          height: 'max-content',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          position: 'absolute',
+                        }}
+                        className='tags-list card'
+                      >
+                        {selectedWorkflows?.length !== 0
+                          ? workflows?.map((t) => {
+                              const isTagSelected = !selectedWorkflows?.some((e) => e._id === t._id)
+                              return (
+                                isTagSelected && (
+                                  <div
+                                    key={t._id}
+                                    onClick={() => handleAdd(t)}
+                                    style={{cursor: 'pointer'}}
+                                    className='btn bg-active-secondary btn-active-secondary'
+                                  >
+                                    {t.title}
+                                  </div>
+                                )
+                              )
+                            })
+                          : workflows?.map((t) => (
+                              <div
+                                key={t._id}
+                                onClick={() => handleAdd(t)}
+                                style={{cursor: 'pointer'}}
+                                className='btn bg-active-secondary btn-active-secondary'
+                              >
+                                {t.title}
+                              </div>
+                            ))}
+                        {selectedWorkflows?.length === workflows?.length && (
+                          <div
+                            style={{cursor: 'pointer'}}
+                            className='btn bg-active-secondary text-muted'
+                          >
+                            All Workflows selected
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
               <div className='col-lg-6'>
                 <div className='row'>
                   <div className='col-xl-3'>
@@ -225,6 +321,8 @@ const ProposalApproval = ({proposal}: PropTypes) => {
                   </div>
                 </div>
               </div>
+            </div>
+            <div className='row mb-8'>
               <div className='col-lg-6'>
                 <div className='row'>
                   <div className='col-xl-3'>

@@ -38,6 +38,18 @@ const post = async (
   } catch (error: any) {
     console.log(error)
 
+    if (error?.response?.data?.message) {
+      return MySwal.fire({
+        text: error.response.data.message,
+        icon: 'error',
+        buttonsStyling: false,
+        confirmButtonText: 'CLose!',
+        heightAuto: false,
+        customClass: {
+          confirmButton: 'btn btn-danger',
+        },
+      }).then(() => {})
+    }
     switch (error.message) {
       case 'Network Error':
         MySwal.fire({

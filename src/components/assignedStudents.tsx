@@ -99,7 +99,17 @@ const AssignedStudents = ({role = 'Users'}) => {
                 </tr>
               </thead>
               <tbody>
-                {isLoading ? <Spinner /> : ''}
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={7}>
+                      <div className='fv-row d-flex justify-content-center mh-300px'>
+                        <Spinner />
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 {students ? (
                   students.map((user: User) => {
                     return (

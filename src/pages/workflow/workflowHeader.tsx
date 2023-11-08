@@ -36,6 +36,7 @@ const WorkflowHeader = ({setCurrentWorkflow, setPage}: PropTypes) => {
           {workflows && workflows?.length > 0 ? (
             workflows.map((workflow) => (
               <div
+                key={workflow._id}
                 style={{cursor: 'pointer'}}
                 onClick={() => setCurrentWorkflow(workflow)}
                 className='d-flex flex-stack bg-none'

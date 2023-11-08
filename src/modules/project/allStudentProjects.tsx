@@ -36,7 +36,7 @@ const AllStudentsProjects = () => {
       setIsLoading(true)
       try {
         if (token) {
-          const RESPONSE = await get(`projects/ofStudent/${studentId}`, token)
+          const RESPONSE = await get(`projects/student/review/${studentId}`, token)
           setProjects(RESPONSE.data)
           setIsLoading(false)
         }

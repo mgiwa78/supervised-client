@@ -117,7 +117,7 @@ const MyProjects = () => {
                         <div className='fw-semibold text-gray-400'>Created Date</div>
                       </div>
                       <div className='border border-gray-300 border-dashed rounded min-w-120px py-3 px-4 mb-3'>
-                        <div className='fs-6 text-gray-800 fw-bold'>0</div>
+                        <div className='fs-6 text-gray-800 fw-bold'>{project?.files.length}</div>
                         <div className='fw-semibold text-gray-400'>Documents</div>
                       </div>
                     </div>
