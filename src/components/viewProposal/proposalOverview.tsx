@@ -18,7 +18,7 @@ const ProposalOverview = ({proposal}: PropType) => {
     <>
       {proposal ? (
         <div className='row'>
-          <div className='col-lg-6'>
+          <div className='col-lg-6 mb-8'>
             <div className='card  h-lg-100'>
               <div className='card-header '>
                 <div className='card-title flex-column'>
@@ -76,7 +76,7 @@ const ProposalOverview = ({proposal}: PropType) => {
               </div>
             </div>
           </div>
-          <div className='col-lg-6'>
+          <div className='col-lg-6 mb-8'>
             <div className='card  h-lg-100'>
               <div className='card-header '>
                 <div className='card-title flex-column'>

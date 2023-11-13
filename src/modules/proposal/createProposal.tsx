@@ -119,21 +119,24 @@ const CreateProposal = () => {
         const RESPONSE: any = await post('proposals', {...values}, token, false)
 
         if (RESPONSE.data) {
-          const all = await acceptedFiles.map(async (e) => {
+          const all = acceptedFiles.map(async (e) => {
             const fileUploadData = await hadlefileFileUpload(RESPONSE.data._id, e)
 
             const a = await getDownloadURL(fileUploadData.ref)
+
             return {path: a, name: fileUploadData.name}
           })
-          const resolveAll = await Promise.all(all)
 
-          const RES: any = await put(
-            `proposals/${RESPONSE.data._id}`,
-            {files: resolveAll},
-            token,
-            true,
-            'Proposal Submitted'
-          )
+          await Promise.all(all).then(async (data) => {
+            const e = data
+            await put(
+              `proposals/${RESPONSE.data._id}`,
+              {files: e},
+              token,
+              true,
+              'Proposal Submitted'
+            )
+          })
         }
 
         formik.values = initialValues

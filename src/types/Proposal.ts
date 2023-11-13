@@ -4,6 +4,7 @@ export interface TProposal {
   title: string
   description: string
   status: string
+  workflow: string
   field: string
   methodology: string
   objectives: string[]

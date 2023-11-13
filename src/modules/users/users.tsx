@@ -126,7 +126,8 @@ const Users = ({role = 'Users'}) => {
                 ) : (
                   ''
                 )}
-                {users ? (
+                {users &&
+                  users?.length > 0 &&
                   users.map((user: User) => {
                     return (
                       <tr key={user._id}>
@@ -194,8 +195,9 @@ const Users = ({role = 'Users'}) => {
                         )}
                       </tr>
                     )
-                  })
-                ) : (
+                  })}
+
+                {!isLoading && users?.length === 0 && (
                   <tr>
                     <td colSpan={7}>
                       <div className='fv-row d-flex justify-content-center mh-300px'>

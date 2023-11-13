@@ -23,8 +23,8 @@ const ProposalApprovalSchema = Yup.object().shape({
   title: Yup.string().required('Project Title is required'),
   methodology: Yup.string().required('Project Methodology is required'),
   timeline: Yup.string().required('Project Timeline is required'),
+  workflow: Yup.string().required('Project Workflow is required'),
   description: Yup.string().required('Project Description is required'),
-  field: Yup.string().required('Project field is required'),
 })
 
 const ProposalApproval = ({proposal}: PropTypes) => {
@@ -76,12 +76,13 @@ const ProposalApproval = ({proposal}: PropTypes) => {
 
   const formik = useFormik({
     initialValues: {...proposal},
+    validationSchema: ProposalApprovalSchema,
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setIsLoading(true)
       try {
         const RESPONSE: any = await post(
           'proposals/approve',
-          {...proposal, workflows: workflows.map((e) => e._id)},
+          {...values},
           token,
           true,
           'Project Approved'
@@ -219,7 +220,7 @@ const ProposalApproval = ({proposal}: PropTypes) => {
               </div>
             </div>
             <div className='row mb-8'>
-              <div className='col-6'>
+              {/* <div className='col-6'>
                 <div className='d-flex flex-column mb-8 fv-row'>
                   <label className='d-flex align-items-center fs-6 fw-semibold mb-2'>
                     <span>Workflows</span>
@@ -293,6 +294,35 @@ const ProposalApproval = ({proposal}: PropTypes) => {
                             All Workflows selected
                           </div>
                         )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div> */}{' '}
+              <div className='col-6'>
+                <div className='row'>
+                  <div className='col-xl-3'>
+                    <div className='fs-6 fw-semibold mt-2 mb-3'>Workflow</div>
+                  </div>
+                  <div className='col-xl-9 fv-row fv-plugins-icon-container'>
+                    <select
+                      {...formik.getFieldProps('workflow')}
+                      className='form-control form-control-solid'
+                    >
+                      {workflows.map((workflow) => (
+                        <>
+                          <option value=''>Select Project Workflow</option>
+                          <option key={workflow._id} value={workflow._id}>
+                            {workflow.title}
+                          </option>
+                        </>
+                      ))}
+                    </select>
+                    {formik.touched.workflow && formik.errors.workflow && (
+                      <div className='fv-plugins-message-container'>
+                        <div className='fv-help-block'>
+                          <span role='alert'>{formik.errors.workflow}</span>
+                        </div>
                       </div>
                     )}
                   </div>

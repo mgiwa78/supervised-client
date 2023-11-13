@@ -7,7 +7,7 @@ export interface TProject {
   createdAt: string
   description: string
   student: User
-  workflows: Array<TWorkflow>
+  workflow: TWorkflow
   files: Array<{
     _id: string
     status: string
@@ -22,6 +22,6 @@ export interface TProject {
   resources: string[]
   ethicalConsiderations: string
   milestones: {name: string; date: Date}[]
-  status: TWorkflow
+  status: string
   comments: string
 }

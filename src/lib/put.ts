@@ -15,6 +15,7 @@ const put = async (
   promt: string | null
 ) => {
   try {
+    console.log(data)
     const RESPONSE = await axios.put(process.env.REACT_APP_API_URL + path, data, {
       headers: {
         _method: 'put',

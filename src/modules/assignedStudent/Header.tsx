@@ -112,34 +112,40 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
                   </div>
                 </div>
               </div>
-              {project?.workflows?.map((workflow) => (
+              {project?.workflow?.states.map((state) => (
                 <div className='col-3'>
-                  <div className={`d-flex flex-stack fs-4 py-3 px-2 bg-light-${workflow.color}`}>
+                  <div className={`d-flex flex-stack fs-4 py-3 px-2 bg-light-${state.color}`}>
                     <div
                       className='fw-bold rotate cursor-pointer'
                       data-bs-toggle='collapse'
                       role='button'
                       aria-expanded='false'
-                      data-bs-target={`#${workflow._id}`}
-                      aria-controls={`${workflow._id}`}
+                      data-bs-target={`#${state._id}`}
+                      aria-controls={`${state._id}`}
                     >
-                      {workflow.title}
+                      {state.title}
                       <span className='ms-2 rotate-180'>
                         <i className='ki-duotone ki-down fs-3'></i>
                       </span>
                     </div>
                   </div>
                   <div className='separator separator-dashed my-1'></div>
-                  <div id={`${workflow._id}`} className='collapse show '>
+                  <div id={`${state._id}`} className='collapse show '>
                     <li className='d-flex align-items-center py-2 ' style={{marginLeft: '20px'}}>
                       <span
                         style={{cursor: 'pointer'}}
                         className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
                       >
-                        {project?.files.filter((file) => file?.status === workflow?._id).length >
-                        0 ? (
+                        {project?.files.filter(
+                          (file) =>
+                            file?.status === state?._id || (!file.status && state.position === '-1')
+                        ).length > 0 ? (
                           project?.files
-                            .filter((file) => file?.status === workflow?._id)
+                            .filter((file) => {
+                              if (!file.status && state.position === '-1') {
+                                return !file.status
+                              } else return file?.status === state?._id
+                            })
                             .map((file) => (
                               <li
                                 key={file._id}

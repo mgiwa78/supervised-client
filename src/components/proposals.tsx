@@ -128,7 +128,9 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
                           </span>
                         </td>
                         <td>
-                          <span className='badge badge-light-warning'>{proposal.status}</span>
+                          <span className='badge badge-light-warning'>
+                            {proposal.status || 'Pending'}
+                          </span>
                         </td>
                         {/* <td>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'></span>
