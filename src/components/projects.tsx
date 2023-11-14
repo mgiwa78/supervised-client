@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {KTIcon, toAbsoluteUrl} from '../_metronic/helpers'
 import {Link, useParams} from 'react-router-dom'
 import {useSelector} from 'react-redux'
@@ -17,8 +17,64 @@ type Props = {
 
 const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
   const currentUser = useSelector(selectUser)
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(0)
+  const [filter, setFilter] = useState(0)
+  const [pageSize, setPageSize] = useState(5)
+
+  const handlePageClick = (page: any) => {
+    setCurrentPage(page)
+  }
+
+  const filteredData = useMemo(() => {
+    setCurrentPage(0)
+    return projects?.filter((project) =>
+      Object.values(project).some(
+        (value) =>
+          typeof value === 'string' && value.toLowerCase().includes(searchTerm.trim().toLowerCase())
+      )
+    )
+  }, [projects, searchTerm])
+
+  const paginatedData = useMemo(() => {
+    const startIndex = currentPage * pageSize
+    return filteredData.slice(startIndex, startIndex + pageSize)
+  }, [filteredData, currentPage, pageSize])
+
+  const totalPages = Math.ceil(filteredData?.length / pageSize)
+
+  const paginationItems = []
+
+  for (let i = 0; i < totalPages; i++) {
+    paginationItems.push(
+      <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+        <button className='page-link' onClick={() => handlePageClick(i)}>
+          {i + 1}
+        </button>
+      </li>
+    )
+  }
   return (
-    <div>
+    <div style={{minHeight: '100%', position: 'relative'}}>
+      <div className='d-flex flex-wrap flex-stack my-5' data-select2-id='select2-data-121-rgid'>
+        <h2>Projects</h2>
+        <div className='d-flex flex-wrap my-1'>
+          <div className='d-flex align-items-center position-relative me-4'>
+            <i className='ki-duotone ki-magnifier fs-3 position-absolute ms-3'>
+              <span className='path1'></span>
+              <span className='path2'></span>
+            </i>
+            <input
+              onChange={(e) => setSearchTerm(e.target.value)}
+              type='text'
+              id='kt_filter_search'
+              className='form-control form-control-sm form-control-solid w-150px ps-10'
+              placeholder='Search'
+            />
+          </div>
+        </div>
+      </div>
       <div className='row g-6 g-xl-9'>
         <>
           {projects.length > 0 &&
@@ -84,6 +140,40 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
             </div>
           )}
         </>
+      </div>{' '}
+      <div className='d-flex' style={{position: 'absolute', bottom: '20px', right: '20px'}}>
+        <select
+          name='status'
+          data-control='select2'
+          data-hide-search='true'
+          className='form-select form-select-sm form-select-solid w-80px select2-hidden-accessible'
+          tabIndex={-1}
+          aria-hidden='true'
+          data-kt-initialized='1'
+          onChange={(e) => {
+            setCurrentPage(0)
+            setPageSize(Number(e.target.value))
+          }}
+          defaultValue={pageSize}
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={50}>50</option>
+        </select>
+        <ul className='pagination'>
+          <li className={`page-item previous ${currentPage === 0 ? 'disabled' : ''}`}>
+            <a href='#' className='page-link' onClick={() => handlePageClick(currentPage - 1)}>
+              <i className='previous'></i>
+            </a>
+          </li>
+          {paginationItems}
+          <li className={`page-item next ${currentPage === totalPages - 1 ? 'disabled' : ''}`}>
+            <a href='#' className='page-link' onClick={() => handlePageClick(currentPage + 1)}>
+              <i className='next'></i>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
   )

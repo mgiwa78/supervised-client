@@ -60,7 +60,7 @@ const CreateProject = () => {
 
   useEffect(() => {
     const getUsers = async () => {
-      const RESPONSE = await get(`users/students`, token)
+      const RESPONSE = await get(`users/students?onDepartment=false`, token)
       if (RESPONSE.data) {
         setStudents(RESPONSE.data)
       }

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {PageLink, PageTitle} from '../../_metronic/layout/core'
 import Permission from '../../types/Permission'
 import {useSelector} from 'react-redux'
@@ -42,13 +42,66 @@ const Permissions = () => {
     getPermissions()
   }, [])
 
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(0)
+  const [filter, setFilter] = useState(0)
+  const [pageSize, setPageSize] = useState(5)
+
+  const handlePageClick = (page: any) => {
+    setCurrentPage(page)
+  }
+
+  const filteredData = useMemo(() => {
+    setCurrentPage(0)
+    return permissions?.filter((permission) =>
+      Object.values(permission.permission).some(
+        (value: any) =>
+          typeof value === 'string' && value.toLowerCase().includes(searchTerm.trim().toLowerCase())
+      )
+    )
+  }, [permissions, searchTerm])
+
+  const paginatedData = useMemo(() => {
+    const startIndex = currentPage * pageSize
+    return filteredData?.slice(startIndex, startIndex + pageSize)
+  }, [filteredData, currentPage, pageSize])
+
+  const totalPages = Math.ceil(filteredData?.length / pageSize)
+
+  const paginationItems = []
+
+  for (let i = 0; i < totalPages; i++) {
+    paginationItems.push(
+      <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+        <button className='page-link' onClick={() => handlePageClick(i)}>
+          {i + 1}
+        </button>
+      </li>
+    )
+  }
+
   return (
     <>
       <PageTitle breadcrumbs={permissionsBreadcrumbs}>Permissions list</PageTitle>
       <div>
         <div className='card card-flush'>
-          {/* <div className='card-header mt-6'>
-            <div className='card-title'>
+          <div className='card-header mt-6'>
+            <div className='card-toolbar'>
+              <div className='d-flex align-items-center position-relative me-4'>
+                <i className='ki-duotone ki-magnifier fs-3 position-absolute ms-3'>
+                  <span className='path1'></span>
+                  <span className='path2'></span>
+                </i>
+                <input
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  type='text'
+                  id='kt_filter_search'
+                  className='form-control form-control-sm form-control-solid w-150px ps-10'
+                  placeholder='Search'
+                />
+              </div>
+            </div>
+            {/* <div className='card-title'>
               <div className='d-flex align-items-center position-relative my-1 me-5'>
                 <i className='ki-duotone ki-magnifier fs-3 position-absolute ms-5'>
                   <span className='path1'></span>
@@ -62,7 +115,7 @@ const Permissions = () => {
                 />
               </div>
             </div> */}
-          {/* <div className='card-toolbar'>
+            {/* <div className='card-toolbar'>
               <button
                 type='button'
                 className='btn btn-light-primary'
@@ -76,8 +129,8 @@ const Permissions = () => {
                 </i>
                 Add Permission
               </button>
-            </div> 
-          </div>*/}
+            </div> */}
+          </div>
           <div className='card-body pt-0'>
             <div
               id='kt_permissions_table_wrapper'
@@ -134,7 +187,7 @@ const Permissions = () => {
                   </thead>
                   <tbody className='fw-semibold text-gray-600'>
                     {permissions ? (
-                      permissions.map((perm) => (
+                      paginatedData.map((perm) => (
                         <tr key={perm.permission._id} className='odd'>
                           <td>{perm.permission.action}</td>
                           <td>
@@ -192,18 +245,25 @@ const Permissions = () => {
               <div className='row'>
                 <div className='col-sm-12 col-md-5 d-flex align-items-center justify-content-center justify-content-md-start'>
                   <div className='dataTables_length' id='kt_permissions_table_length'>
-                    <label>
-                      <select
-                        name='kt_permissions_table_length'
-                        aria-controls='kt_permissions_table'
-                        className='form-select form-select-sm form-select-solid'
-                      >
-                        <option value='10'>10</option>
-                        <option value='25'>25</option>
-                        <option value='50'>50</option>
-                        <option value='100'>100</option>
-                      </select>
-                    </label>
+                    <select
+                      name='status'
+                      data-control='select2'
+                      data-hide-search='true'
+                      className='form-select form-select-sm form-select-solid w-80px select2-hidden-accessible'
+                      tabIndex={-1}
+                      aria-hidden='true'
+                      data-kt-initialized='1'
+                      onChange={(e) => {
+                        setCurrentPage(0)
+                        setPageSize(Number(e.target.value))
+                      }}
+                      defaultValue={pageSize}
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
                   </div>
                 </div>
                 <div className='col-sm-12 col-md-7 d-flex align-items-center justify-content-center justify-content-md-end'>
@@ -212,41 +272,25 @@ const Permissions = () => {
                     id='kt_permissions_table_paginate'
                   >
                     <ul className='pagination'>
-                      <li
-                        className='paginate_button page-item previous disabled'
-                        id='kt_permissions_table_previous'
-                      >
+                      <li className={`page-item previous ${currentPage === 0 ? 'disabled' : ''}`}>
                         <a
                           href='#'
-                          aria-controls='kt_permissions_table'
-                          data-dt-idx='0'
-                          tabIndex={0}
                           className='page-link'
+                          onClick={() => handlePageClick(currentPage - 1)}
                         >
                           <i className='previous'></i>
                         </a>
                       </li>
-                      <li className='paginate_button page-item active'>
-                        <a
-                          href='#'
-                          aria-controls='kt_permissions_table'
-                          data-dt-idx='1'
-                          tabIndex={0}
-                          className='page-link'
-                        >
-                          1
-                        </a>
-                      </li>
+                      {paginationItems}
                       <li
-                        className='paginate_button page-item next disabled'
-                        id='kt_permissions_table_next'
+                        className={`page-item next ${
+                          currentPage === totalPages - 1 ? 'disabled' : ''
+                        }`}
                       >
                         <a
                           href='#'
-                          aria-controls='kt_permissions_table'
-                          data-dt-idx='2'
-                          tabIndex={0}
                           className='page-link'
+                          onClick={() => handlePageClick(currentPage + 1)}
                         >
                           <i className='next'></i>
                         </a>

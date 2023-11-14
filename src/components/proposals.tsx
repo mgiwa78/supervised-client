@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {PageTitle} from '../_metronic/layout/core'
 import type {PageLink} from '../_metronic/layout/core'
 import {KTIcon} from '../_metronic/helpers'
@@ -25,9 +25,48 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
   //     getProposals(newuser)
   //   }
   const currentUser = useSelector(selectUser)
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(0)
+  const [filter, setFilter] = useState(0)
+  const [pageSize, setPageSize] = useState(5)
+
+  const handlePageClick = (page: any) => {
+    setCurrentPage(page)
+  }
+
+  const filteredData = useMemo(() => {
+    setCurrentPage(0)
+    return proposals?.filter((proposal) =>
+      Object.values(proposal).some(
+        (value) =>
+          typeof value === 'string' && value.toLowerCase().includes(searchTerm.trim().toLowerCase())
+      )
+    )
+  }, [proposals, searchTerm])
+
+  const paginatedData = useMemo(() => {
+    const startIndex = currentPage * pageSize
+    return filteredData.slice(startIndex, startIndex + pageSize)
+  }, [filteredData, currentPage, pageSize])
+
+  const totalPages = Math.ceil(filteredData?.length / pageSize)
+
+  const paginationItems = []
+
+  for (let i = 0; i < totalPages; i++) {
+    paginationItems.push(
+      <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+        <button className='page-link' onClick={() => handlePageClick(i)}>
+          {i + 1}
+        </button>
+      </li>
+    )
+  }
+
   return (
     <>
-      <div className={`card mb-5 mb-xl-8`}>
+      <div className={`card mb-5 mb-xl-8`} style={{minHeight: '100%', position: 'relative'}}>
         <div className='card-header border-0 pt-5'>
           <h3 className='card-title align-items-start flex-column'>
             <span className='card-label fw-bold fs-3 mb-1'>Proposals</span>
@@ -35,44 +74,62 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
               Total {role} {proposals ? proposals.length : ''}
             </span>
           </h3>
-          {currentUser?.roles.some((role) => role.name === 'Student') && (
-            <div className='card-toolbar'>
-              <button
-                type='button'
-                className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
-                data-kt-menu-trigger='click'
-                data-kt-menu-placement='bottom-end'
-                data-kt-menu-flip='top-end'
-              >
-                <KTIcon iconName='category' className='fs-2' />
-              </button>
-              <div
-                className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
-                data-kt-menu='true'
-              >
-                <div className='menu-item px-3'>
-                  <div className='menu-content fs-6 text-dark fw-bold px-3 py-4'>Quick Actions</div>
-                </div>
-                <div className='separator mb-3 opacity-75'></div>
 
-                <div className='menu-item px-3'>
-                  <a onClick={() => null} className='menu-link px-3'>
-                    New Proposal
-                  </a>
-                </div>
+          <div className='card-toolbar'>
+            <div className='d-flex align-items-center position-relative me-4'>
+              <i className='ki-duotone ki-magnifier fs-3 position-absolute ms-3'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+              </i>
+              <input
+                onChange={(e) => setSearchTerm(e.target.value)}
+                type='text'
+                id='kt_filter_search'
+                className='form-control form-control-sm form-control-solid w-150px ps-10'
+                placeholder='Search'
+              />
+            </div>
+            {currentUser?.roles.some((role) => role.name === 'Student') && (
+              <>
+                <button
+                  type='button'
+                  className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
+                  data-kt-menu-trigger='click'
+                  data-kt-menu-placement='bottom-end'
+                  data-kt-menu-flip='top-end'
+                >
+                  <KTIcon iconName='category' className='fs-2' />
+                </button>
+                <div
+                  className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
+                  data-kt-menu='true'
+                >
+                  <div className='menu-item px-3'>
+                    <div className='menu-content fs-6 text-dark fw-bold px-3 py-4'>
+                      Quick Actions
+                    </div>
+                  </div>
+                  <div className='separator mb-3 opacity-75'></div>
 
-                <div className='separator mt-3 opacity-75'></div>
+                  <div className='menu-item px-3'>
+                    <a onClick={() => null} className='menu-link px-3'>
+                      New Proposal
+                    </a>
+                  </div>
 
-                {/* <div className='menu-item px-3'>
+                  <div className='separator mt-3 opacity-75'></div>
+
+                  {/* <div className='menu-item px-3'>
                 <div className='menu-content px-3 py-3'>
                   <a className='btn btn-primary btn-sm px-4' href='#'>
                     Generate Reports
                   </a>
                 </div>
               </div> */}
-              </div>
-            </div>
-          )}
+                </div>{' '}
+              </>
+            )}
+          </div>
         </div>
         <div className='card-body py-3'>
           <div className='table-responsive'>
@@ -102,7 +159,7 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
               <tbody>
                 {isLoading ? <Spinner /> : ''}
                 {proposals ? (
-                  proposals.map((proposal: TProposal) => {
+                  paginatedData.map((proposal: TProposal) => {
                     return (
                       <tr key={proposal._id}>
                         <td>
@@ -173,7 +230,51 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
                   </tr>
                 )}
               </tbody>
-            </table>
+            </table>{' '}
+            <div className='d-flex' style={{position: 'absolute', bottom: '20px', right: '20px'}}>
+              <select
+                name='status'
+                data-control='select2'
+                data-hide-search='true'
+                className='form-select form-select-sm form-select-solid w-80px select2-hidden-accessible'
+                tabIndex={-1}
+                aria-hidden='true'
+                data-kt-initialized='1'
+                onChange={(e) => {
+                  setCurrentPage(0)
+                  setPageSize(Number(e.target.value))
+                }}
+                defaultValue={pageSize}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <ul className='pagination'>
+                <li className={`page-item previous ${currentPage === 0 ? 'disabled' : ''}`}>
+                  <a
+                    href='#'
+                    className='page-link'
+                    onClick={() => handlePageClick(currentPage - 1)}
+                  >
+                    <i className='previous'></i>
+                  </a>
+                </li>
+                {paginationItems}
+                <li
+                  className={`page-item next ${currentPage === totalPages - 1 ? 'disabled' : ''}`}
+                >
+                  <a
+                    href='#'
+                    className='page-link'
+                    onClick={() => handlePageClick(currentPage + 1)}
+                  >
+                    <i className='next'></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

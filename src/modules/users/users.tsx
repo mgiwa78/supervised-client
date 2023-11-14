@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {PageTitle} from '../../_metronic/layout/core'
 import type {PageLink} from '../../_metronic/layout/core'
 import {KTIcon} from '../../_metronic/helpers'
@@ -42,9 +42,47 @@ const Users = ({role = 'Users'}) => {
     newuser ? setItemIdForUpdate(newuser._id) : setItemIdForUpdate(null)
     selectUser(newuser)
   }
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(0)
+  const [filter, setFilter] = useState(0)
+  const [pageSize, setPageSize] = useState(5)
+
+  const handlePageClick = (page: any) => {
+    setCurrentPage(page)
+  }
+
+  const filteredData = useMemo(() => {
+    setCurrentPage(0)
+    return users?.filter((user: any) =>
+      Object.values(user).some(
+        (value) =>
+          typeof value === 'string' && value.toLowerCase().includes(searchTerm.trim().toLowerCase())
+      )
+    )
+  }, [users, searchTerm])
+
+  const paginatedData = useMemo(() => {
+    const startIndex = currentPage * pageSize
+    return filteredData?.slice(startIndex, startIndex + pageSize)
+  }, [filteredData, currentPage, pageSize])
+
+  const totalPages = Math.ceil(filteredData?.length / pageSize)
+
+  const paginationItems = []
+
+  for (let i = 0; i < totalPages; i++) {
+    paginationItems.push(
+      <li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+        <button className='page-link' onClick={() => handlePageClick(i)}>
+          {i + 1}
+        </button>
+      </li>
+    )
+  }
   return (
     <>
-      <div className={`card mb-5 mb-xl-8`}>
+      <div className={`card mb-5 mb-xl-8`} style={{minHeight: '100%', position: 'relative'}}>
         <div className='card-header border-0 pt-5'>
           <h3 className='card-title align-items-start flex-column'>
             <span className='card-label fw-bold fs-3 mb-1'>All {role}</span>
@@ -53,6 +91,19 @@ const Users = ({role = 'Users'}) => {
             </span>
           </h3>
           <div className='card-toolbar'>
+            <div className='d-flex align-items-center position-relative me-4'>
+              <i className='ki-duotone ki-magnifier fs-3 position-absolute ms-3'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+              </i>
+              <input
+                onChange={(e) => setSearchTerm(e.target.value)}
+                type='text'
+                id='kt_filter_search'
+                className='form-control form-control-sm form-control-solid w-150px ps-10'
+                placeholder='Search'
+              />
+            </div>
             <button
               type='button'
               className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
@@ -128,7 +179,7 @@ const Users = ({role = 'Users'}) => {
                 )}
                 {users &&
                   users?.length > 0 &&
-                  users.map((user: User) => {
+                  paginatedData.map((user: User) => {
                     return (
                       <tr key={user._id}>
                         <td>
@@ -210,6 +261,50 @@ const Users = ({role = 'Users'}) => {
                 )}
               </tbody>
             </table>
+            <div className='d-flex' style={{position: 'absolute', bottom: '20px', right: '20px'}}>
+              <select
+                name='status'
+                data-control='select2'
+                data-hide-search='true'
+                className='form-select form-select-sm form-select-solid w-80px select2-hidden-accessible'
+                tabIndex={-1}
+                aria-hidden='true'
+                data-kt-initialized='1'
+                onChange={(e) => {
+                  setCurrentPage(0)
+                  setPageSize(Number(e.target.value))
+                }}
+                defaultValue={pageSize}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <ul className='pagination'>
+                <li className={`page-item previous ${currentPage === 0 ? 'disabled' : ''}`}>
+                  <a
+                    href='#'
+                    className='page-link'
+                    onClick={() => handlePageClick(currentPage - 1)}
+                  >
+                    <i className='previous'></i>
+                  </a>
+                </li>
+                {paginationItems}
+                <li
+                  className={`page-item next ${currentPage === totalPages - 1 ? 'disabled' : ''}`}
+                >
+                  <a
+                    href='#'
+                    className='page-link'
+                    onClick={() => handlePageClick(currentPage + 1)}
+                  >
+                    <i className='next'></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

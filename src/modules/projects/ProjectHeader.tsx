@@ -73,7 +73,7 @@ const ProjectHeader = ({setPage, page, project}: any) => {
                         data-kt-countup-value='5'
                         data-kt-initialized='1'
                       >
-                        {project?.documents.length}
+                        {project?.files.length}
                       </div>
                     </div>
                     <div className='fw-semibold fs-6 text-gray-400'>Documents</div>
