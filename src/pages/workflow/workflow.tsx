@@ -132,7 +132,7 @@ const Workflow = () => {
                           </div>
                         </div>
                         <div
-                          className='d-flex d-flex g-2'
+                          className='d-flex d-flex g-5'
                           style={{height: 'max-content', flexWrap: 'wrap'}}
                         >
                           {workflow.states.length > 0 ? (
