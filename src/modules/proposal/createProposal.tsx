@@ -32,11 +32,15 @@ const RepeaterItem = ({
           value={item}
           onChange={(e) => Change(i, e.target.value)}
           className='form-control mb-2 mb-md-0 objective'
-          placeholder='objectives'
+          placeholder={`Project Objective ${i + 1}`}
         />
       </div>
       <div className='col-md-4'>
-        <button onClick={onRemove} className='btn btn-sm btn-light-danger mt-3 mt-md-8'>
+        <button
+          type='button'
+          onClick={onRemove}
+          className='btn btn-sm btn-light-danger mt-3 mt-md-8'
+        >
           <i className='ki-duotone ki-trash fs-5'></i>
           Delete
         </button>
@@ -54,18 +58,12 @@ const loginSchema = Yup.object().shape({
 })
 
 const initialValues = {
-  title: 'Automated Customer Support System',
-  description:
-    'This project aims to develop an automated customer support system using AI and natural language processing to enhance customer service interactions.',
-  objectives: [
-    'Implement a chatbot for instant customer query resolution.',
-    'Integrate sentiment analysis to gauge customer satisfaction levels.',
-    'Provide personalized recommendations based on customer preferences.',
-    'Enable seamless handoff to human agents for complex issues.',
-  ],
-  timeline: '2 Months',
-  methodology: 'Experimental Study',
-  field: 'Computer Science',
+  title: '',
+  description: '',
+  objectives: [''],
+  timeline: '',
+  methodology: '',
+  field: '',
 }
 
 const CreateProposal = () => {
@@ -82,7 +80,7 @@ const CreateProposal = () => {
 
   const {acceptedFiles, getRootProps, getInputProps} = useDropzone()
 
-  const files = acceptedFiles.map((file: any) => (
+  let files = acceptedFiles.map((file: any) => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
@@ -93,7 +91,9 @@ const CreateProposal = () => {
   }
 
   const removeItem = (index: number) => {
-    const updatedItems = items.filter((item, i) => i !== index)
+    console.log(index)
+    const updatedItems = items.filter((item, i) => Number(i) !== Number(index))
+    console.log(updatedItems)
     setItems(updatedItems)
   }
 
@@ -127,23 +127,29 @@ const CreateProposal = () => {
             return {path: a, name: fileUploadData.name}
           })
 
-          await Promise.all(all).then(async (data) => {
-            const e = data
-            await put(
-              `proposals/${RESPONSE.data._id}`,
-              {files: e},
-              token,
-              true,
-              'Proposal Submitted'
-            )
-          })
+          await Promise.all(all)
+            .then(async (data) => {
+              const e = data
+              await put(
+                `proposals/${RESPONSE.data._id}`,
+                {files: e},
+                token,
+                true,
+                'Proposal Submitted'
+              )
+            })
+            .then(() => {
+              files = []
+              formik.resetForm()
+            })
         }
 
-        formik.values = initialValues
         setItems([''])
         setSubmitting(false)
         setLoading(false)
       } catch (error: any) {
+        formik.resetForm()
+        files = []
         console.log(error)
         setSubmitting(false)
         setLoading(false)
@@ -194,6 +200,7 @@ const CreateProposal = () => {
                 {...formik.getFieldProps('title')}
                 className={clsx('form-control form-control-solid')}
                 name='title'
+                placeholder='Enter project title here'
               />
               {formik.touched.title && formik.errors.title && (
                 <div className='fv-plugins-message-container'>
@@ -212,6 +219,7 @@ const CreateProposal = () => {
             </div>
             <div className='col-xl-9 fv-row fv-plugins-icon-container'>
               <textarea
+                placeholder='Enter project description here'
                 {...formik.getFieldProps('description')}
                 name='description'
                 className='form-control form-control-solid h-100px'
@@ -226,6 +234,7 @@ const CreateProposal = () => {
             </div>
             <div className='col-xl-9 fv-row fv-plugins-icon-container'>
               <input
+                placeholder='Enter project field here'
                 type='text'
                 {...formik.getFieldProps('objectives')}
                 {...formik.getFieldProps('field')}
@@ -245,11 +254,15 @@ const CreateProposal = () => {
           <div className='row mb-8'></div>
           <div className='row mb-8'>
             <div className='col-xl-3'>
-              <div className='fs-6 fw-semibold mt-2 mb-3'> Timeline</div>
+              <div className='fs-6 fw-semibold mt-2 mb-3'>
+                {' '}
+                <label htmlFor=''>Timeline</label>
+              </div>
             </div>
             <div className='col-xl-9 fv-row fv-plugins-icon-container'>
               <input
                 type='text'
+                placeholder='Enter project timeline here'
                 {...formik.getFieldProps('timeline')}
                 className={clsx('form-control form-control-solid')}
                 name='timeline'
@@ -273,6 +286,7 @@ const CreateProposal = () => {
                 {...formik.getFieldProps('methodology')}
                 className={clsx('form-control form-control-solid')}
                 type='text'
+                placeholder='Enter project methodology here'
                 name='methodology'
               />
               {formik.touched.methodology && formik.errors.methodology && (
@@ -312,7 +326,7 @@ const CreateProposal = () => {
                         item={item}
                         Change={ItemhandleObjChange}
                         i={index}
-                        onRemove={() => removeItem(items.length)}
+                        onRemove={() => removeItem(index)}
                       />
                     </div>
                   ))}

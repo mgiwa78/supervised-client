@@ -13,6 +13,7 @@ import {ppid} from 'process'
 type PropTypes = {
   currentWorkflow: TWorkflow
   setCurrentWorkflow: Function
+  refreshWorkflow: Function
 }
 
 const initialValues = {
@@ -22,16 +23,28 @@ const initialValues = {
   count: '',
   description: '',
 }
+const initialStateValues = {
+  title: '',
+  color: '',
+
+  position: '',
+}
 
 const editWorkflowSchema = Yup.object().shape({
   title: Yup.string().required('Project Title is required'),
   color: Yup.string().required('Project Methodology is required'),
   // description: Yup.string().required('Project Description is required'),
 })
+const WorkflowStateSchema = Yup.object().shape({
+  title: Yup.string().required('State title is required'),
+  color: Yup.string().required('State color  is required'),
+  position: Yup.string().required('State position  is required'),
+})
 
-const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow}: PropTypes) => {
+const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: PropTypes) => {
   const token = useSelector(selectToken)
   const [IsLoading, setIsLoading] = useState<boolean>(false)
+  const [IsStateLoading, setIsStateLoading] = useState<boolean>(false)
   const [statesMod, setStatesMod] = useState<Array<TState>>(currentWorkflow.states)
 
   const [newState, setNewState] = useState<TState>({
@@ -61,17 +74,6 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow}: PropTypes) => {
     currentWorkflow.states = RESPONSE.data
   }
 
-  const deleteState = (toRemove: any) => {
-    setStatesMod(
-      statesMod.filter((e: any) => {
-        console.log(e._id === toRemove._id)
-        return e._id !== toRemove._id
-      })
-    )
-
-    console.log(statesMod)
-  }
-
   const formik = useFormik({
     initialValues: currentWorkflow,
     validationSchema: editWorkflowSchema,
@@ -87,6 +89,7 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow}: PropTypes) => {
         )
         if (1) {
           formik.values = initialValues
+          refreshWorkflow()
         }
 
         console.log(RESPONSE)
@@ -109,7 +112,64 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow}: PropTypes) => {
       }
     },
   })
+  const formikState = useFormik({
+    initialValues: initialStateValues,
+    validationSchema: WorkflowStateSchema,
+    onSubmit: async (values, {setStatus, setSubmitting}) => {
+      setIsStateLoading(true)
 
+      try {
+        console.log(currentWorkflow)
+        const RESPONSE: any = await post(
+          `states/${currentWorkflow._id}`,
+          {...values},
+          token,
+          true,
+          'State Created'
+        )
+        refreshWorkflow()
+        console.log(RESPONSE.data)
+        setStatesMod(RESPONSE.data)
+        formikState.values = initialStateValues
+
+        setSubmitting(false)
+        setIsStateLoading(false)
+      } catch (error: any) {
+        console.log(error)
+        setSubmitting(false)
+        setIsLoading(false)
+
+        if (error.response?.data.message) {
+          return setStatus(error.response.data.message)
+        }
+        if (error.response?.data.error) {
+          return setStatus(error.response.data.error)
+        } else {
+          return setStatus(error.error)
+        }
+      }
+    },
+  })
+
+  const deleteState = async (toRemove: any) => {
+    const newState = statesMod.filter((e: any) => e._id !== toRemove._id)
+
+    const newStateIDs = statesMod.filter((e: any) => e._id !== toRemove._id).map((b) => b._id)
+
+    console.log(newStateIDs)
+
+    const RESPONSE = await put(
+      `workflows/${currentWorkflow._id}`,
+      {...formik.values, states: newStateIDs},
+      token,
+      true,
+      'Workflow state deleted'
+    ).then((res) => {
+      setCurrentWorkflow(res.data)
+      setStatesMod(newState)
+      refreshWorkflow()
+    })
+  }
   return (
     <>
       <div
@@ -171,6 +231,13 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow}: PropTypes) => {
                       name='title'
                       {...formik.getFieldProps('title')}
                     />
+                    {formik.touched.title && formik.errors.title && (
+                      <div className='fv-plugins-message-container'>
+                        <div className='fv-help-block'>
+                          <span role='alert'>{formik.errors.title}</span>
+                        </div>
+                      </div>
+                    )}
                     <div className='fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback'></div>
                   </div>
                   <div className='row mb-7 fv-plugins-icon-container'>
@@ -261,12 +328,19 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow}: PropTypes) => {
                                 </span>
                               </label>
                               <input
-                                value={newState.title}
-                                onChange={(e) => handleNewStateChange(e)}
+                                placeholder='Title'
+                                {...formikState.getFieldProps('title')}
                                 type='text'
                                 className='form-control form-control-solid'
-                                name='title'
                               />
+                              {formikState.touched.title && formikState.errors.title && (
+                                <div className='fv-plugins-message-container'>
+                                  <div className='fv-help-block'>
+                                    <span role='alert'>{formikState.errors.title}</span>
+                                  </div>
+                                </div>
+                              )}
+                              <div className='fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback'></div>
                             </div>
                             <div className='col-6'>
                               <label className='fs-6 fw-semibold form-label mt-3'>
@@ -286,18 +360,34 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow}: PropTypes) => {
                                 </span>
                               </label>
                               <select
-                                onChange={(e) => handleNewStateChange(e)}
                                 value={newState.color}
-                                name='color'
+                                {...formikState.getFieldProps('color')}
                                 className='form-control form-control-solid'
+                                placeholder='Title'
                               >
-                                <option value=''>Select Workflow color</option>
-                                <option value='primary'>Blue</option>
-                                <option value='warning'>Orange</option>
-                                <option value='info'>Purple</option>
-                                <option value='danger'>Red</option>
-                                <option value='success'>Green</option>
+                                <option value='#007bff'>Blue </option>
+                                <option value='#ff9800'>Orange </option>
+                                <option value='#5b07a9'>Purple </option>
+                                <option value='#ff0000'>Red </option>
+                                <option value='#008000'>Green</option>
+                                <option value='#808080'>Gray </option>
+                                <option value='#2f4f4f'>Dark </option>
+                                <option value='#f5f5f5'>Light </option>
+                                <option value='#ffd700'>Yellow</option>
+                                <option value='#00ced1'>Turquoise </option>
+                                <option value='#9400d3'>Violet </option>
+                                <option value='#ff1493'>Pink </option>
+                                <option value='#008cff'>Sky Blue </option>
+                                <option value='#4682b4'>Steel Blue </option>
+                                <option value='#ff4500'>Orange Red </option>
                               </select>
+                              {formikState.touched.color && formikState.errors.color && (
+                                <div className='fv-plugins-message-container'>
+                                  <div className='fv-help-block'>
+                                    <span role='alert'>{formikState.errors.color}</span>
+                                  </div>
+                                </div>
+                              )}
                               <div className='fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback'></div>
                             </div>
                             <div className='col-6'>
@@ -305,26 +395,52 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow}: PropTypes) => {
                                 <span className='required'>Position</span>
                               </label>
                               <select
-                                {...formik.getFieldProps('position')}
+                                {...formikState.getFieldProps('position')}
                                 className='form-control form-control-solid'
-                                onChange={(e) => handleNewStateChange(e)}
                               >
                                 <option value=''>Select Position</option>
                                 <option value='-1'>Start</option>
                                 <option value='0'>Transition</option>
                                 <option value='1'>End</option>
                               </select>
+                              {formikState.touched.position && formikState.errors.position && (
+                                <div className='fv-plugins-message-container'>
+                                  <div className='fv-help-block'>
+                                    <span role='alert'>{formikState.errors.position}</span>
+                                  </div>
+                                </div>
+                              )}
                               <div className='fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback'></div>
                             </div>
                           </div>
-                          <div className='row-fv mt-5'>
-                            <button
-                              onClick={() => addState()}
-                              className='btn btn-success'
-                              type='button'
-                            >
-                              Add State
-                            </button>
+                          <div className='row mb-7 fv-plugins-icon-container'>
+                            <div className='d-flex justify-content-end'>
+                              <button
+                                type='reset'
+                                data-kt-contacts-type='cancel'
+                                className='btn btn-light me-3'
+                                onClick={() => setCurrentWorkflow(undefined)}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type='button'
+                                id='kt_sign_in_submit'
+                                className='btn btn-success'
+                                onClick={() => formikState.submitForm()}
+                                disabled={formikState.isSubmitting || !formikState.isValid}
+                              >
+                                {!IsStateLoading && (
+                                  <span className='indicator-label'> Add State</span>
+                                )}
+                                {IsStateLoading && (
+                                  <span className='indicator-progress' style={{display: 'block'}}>
+                                    Please wait...
+                                    <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                                  </span>
+                                )}
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>

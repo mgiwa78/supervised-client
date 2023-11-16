@@ -13,14 +13,14 @@ const Workflow = () => {
 
   const [workflows, setWorkflows] = useState<Array<TWorkflow>>()
   const token = useSelector(selectToken)
+  const getWorkflows = async () => {
+    const RESPONSE = await get(`workflows`, token)
+    if (RESPONSE?.data) {
+      setWorkflows(RESPONSE.data)
+    }
+  }
 
   useEffect(() => {
-    const getWorkflows = async () => {
-      const RESPONSE = await get(`workflows`, token)
-      if (RESPONSE?.data) {
-        setWorkflows(RESPONSE.data)
-      }
-    }
     getWorkflows()
   }, [createNew])
 
@@ -96,13 +96,33 @@ const Workflow = () => {
                 <div className='col-xl-6' data-kt-billing-element='address'>
                   <div className='card card-dashed h-xl-100 flex-row flex-stack flex-wrap p-6'>
                     <div className='d-flex flex-column py-2'>
-                      <div className='d-flex align-items-center fs-5 fw-bold mb-5'>
-                        {workflow?.title}
-                        <span className={`badge badge-${workflow?.color} fs-7 ms-2 py-2`}>
-                          {'  '}
-                        </span>
+                      <div className='d-flex flex-column py-2 mb-3'>
+                        <div className='d-flex align-items-center fs-5 py-0 fw-bold mb-1'>
+                          {workflow?.title}
+                        </div>
+                        <div className='fs-6 fw-semibold text-gray-600'>
+                          {workflow?.description}
+                        </div>
                       </div>
-                      <div className='fs-6 fw-semibold text-gray-600'>{workflow?.description}</div>
+                      <div className='d-flex  d-flex g-2'>
+                        {workflow.states.length > 0 ? (
+                          workflow.states.map((state) => (
+                            <span
+                              style={{width: 'max-content', backgroundColor: state?.color}}
+                              className={`badge fs-7 ms-2 py-2`}
+                            >
+                              {state?.title}
+                            </span>
+                          ))
+                        ) : (
+                          <span
+                            style={{width: 'max-content'}}
+                            className={`text-muted fs-5 ms-2 py-2`}
+                          >
+                            No States
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className='d-flex align-items-center py-2'>
                       <button
@@ -187,9 +207,13 @@ const Workflow = () => {
         <div className='col-lg-8'> */}
         {/* {page === 'new' && !currentWorkflow && <CreateWorkFlow />} */}
         {currentWorkflow && (
-          <EditWorkFlow currentWorkflow={currentWorkflow} setCurrentWorkflow={setCurrentWorkflow} />
+          <EditWorkFlow
+            refreshWorkflow={getWorkflows}
+            currentWorkflow={currentWorkflow}
+            setCurrentWorkflow={setCurrentWorkflow}
+          />
         )}
-        {createNew && <CreateWorkFlow setCreateNew={setCreateNew} />}
+        {createNew && <CreateWorkFlow refreshWorkflow={getWorkflows} setCreateNew={setCreateNew} />}
         {/* </div> */}
       </div>
     </>

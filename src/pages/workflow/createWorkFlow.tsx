@@ -18,7 +18,7 @@ const CreateProjectSchema = Yup.object().shape({
   // description: Yup.string().required('Project Description is required'),
 })
 
-const CreateWorkFlow = ({setCreateNew}: any) => {
+const CreateWorkFlow = ({setCreateNew, refreshWorkflow}: any) => {
   const token = useSelector(selectToken)
   const [IsLoading, setIsLoading] = useState<boolean>(false)
 
@@ -33,6 +33,7 @@ const CreateWorkFlow = ({setCreateNew}: any) => {
         const RESPONSE: any = await post('workflows', {...values}, token, true, 'Workflow Created')
         if (1) {
           formik.values = initialValues
+          refreshWorkflow()
         }
         setCreateNew(false)
         console.log(RESPONSE)
