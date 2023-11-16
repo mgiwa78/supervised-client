@@ -69,8 +69,7 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: Pr
       true,
       'State Created'
     )
-    console.log(RESPONSE)
-    console.log(RESPONSE.data)
+
     currentWorkflow.states = RESPONSE.data
   }
 
@@ -92,7 +91,6 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: Pr
           refreshWorkflow()
         }
 
-        console.log(RESPONSE)
 
         setSubmitting(false)
         setIsLoading(false)
@@ -119,7 +117,6 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: Pr
       setIsStateLoading(true)
 
       try {
-        console.log(currentWorkflow)
         const RESPONSE: any = await post(
           `states/${currentWorkflow._id}`,
           {...values},
@@ -128,7 +125,6 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: Pr
           'State Created'
         )
         refreshWorkflow()
-        console.log(RESPONSE.data)
         setStatesMod(RESPONSE.data)
         formikState.values = initialStateValues
 
@@ -156,7 +152,6 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: Pr
 
     const newStateIDs = statesMod.filter((e: any) => e._id !== toRemove._id).map((b) => b._id)
 
-    console.log(newStateIDs)
 
     const RESPONSE = await put(
       `workflows/${currentWorkflow._id}`,
@@ -263,7 +258,6 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: Pr
                     >
                       {statesMod?.length > 0 ? (
                         statesMod.map((state) => {
-                          console.log(statesMod)
                           return (
                             <div
                               className={`btn btn-${state.color} d-flex gap-2 align-items-center`}

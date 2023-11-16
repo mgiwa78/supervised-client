@@ -28,15 +28,12 @@ const CreateWorkFlow = ({setCreateNew, refreshWorkflow}: any) => {
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setIsLoading(true)
       try {
-        console.log(values)
-
-        const RESPONSE: any = await post('workflows', {...values}, token, true, 'Workflow Created')
+        await post('workflows', {...values}, token, true, 'Workflow Created')
         if (1) {
           formik.values = initialValues
           refreshWorkflow()
         }
         setCreateNew(false)
-        console.log(RESPONSE)
 
         setSubmitting(false)
         setIsLoading(false)

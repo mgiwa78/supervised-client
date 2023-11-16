@@ -106,10 +106,7 @@ const CreateProject = () => {
     validationSchema: CreateProjectSchema,
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setIsLoading(true)
-      console.log('asdda')
       try {
-        console.log(values)
-
         const RESPONSE: any = await post(
           'projects',
           {...values, student: student._id},
@@ -120,8 +117,6 @@ const CreateProject = () => {
         if (1) {
           formik.values = initialValues
         }
-
-        console.log(RESPONSE)
 
         setSubmitting(false)
         setIsLoading(false)

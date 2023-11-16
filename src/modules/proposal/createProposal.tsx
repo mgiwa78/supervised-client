@@ -91,9 +91,7 @@ const CreateProposal = () => {
   }
 
   const removeItem = (index: number) => {
-    console.log(index)
     const updatedItems = items.filter((item, i) => Number(i) !== Number(index))
-    console.log(updatedItems)
     setItems(updatedItems)
   }
 
