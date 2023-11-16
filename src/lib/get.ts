@@ -20,7 +20,7 @@ const get = async (path: string, authToken = '') => {
           text: 'Network Error',
           icon: 'error',
           buttonsStyling: false,
-          confirmButtonText: 'CLose!',
+          confirmButtonText: 'Close!',
           heightAuto: false,
           customClass: {
             confirmButton: 'btn btn-danger',

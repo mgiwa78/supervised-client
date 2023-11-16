@@ -91,7 +91,6 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: Pr
           refreshWorkflow()
         }
 
-
         setSubmitting(false)
         setIsLoading(false)
       } catch (error: any) {
@@ -151,7 +150,6 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: Pr
     const newState = statesMod.filter((e: any) => e._id !== toRemove._id)
 
     const newStateIDs = statesMod.filter((e: any) => e._id !== toRemove._id).map((b) => b._id)
-
 
     const RESPONSE = await put(
       `workflows/${currentWorkflow._id}`,
@@ -260,8 +258,9 @@ const EditWorkFlow = ({currentWorkflow, setCurrentWorkflow, refreshWorkflow}: Pr
                         statesMod.map((state) => {
                           return (
                             <div
-                              className={`btn btn-${state.color} d-flex gap-2 align-items-center`}
+                              className={`btn  d-flex gap-2 align-items-center`}
                               key={state.title}
+                              style={{backgroundColor: state?.color}}
                             >
                               {state.title}
                               <div

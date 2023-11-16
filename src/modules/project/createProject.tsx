@@ -32,7 +32,7 @@ const CreateProjectSchema = Yup.object().shape({
   workflow: Yup.string().required('Project workflow is required'),
   timeline: Yup.string().required('Project timeline is required'),
   supervisor: Yup.string().required('Project supervisor is required'),
-  student: Yup.string().required('Project student is required'),
+  student: Yup.string().required('Student is required'),
   description: Yup.string().required('Project description is required'),
   field: Yup.string(),
 })
@@ -60,6 +60,9 @@ const CreateProject = () => {
   const handleSetStudent = (student: User) => {
     setauthorDrpdw(false)
     setStudent(student)
+    formik.values.student = student?._id
+
+    console.log(formik.values)
   }
   const handleSetSupervisor = (supervisor: User) => {
     setSupervisorDrpdw(false)
@@ -178,25 +181,14 @@ const CreateProject = () => {
                               </span>
                             </div>
                             <div className='ms-4'>
-                              <a
-                                href='../../demo1/dist/apps/contacts/view-contact.html'
-                                className='fs-6 fw-bold text-gray-900 text-hover-primary mb-2'
-                              >
+                              <span className='fs-6 fw-bold text-gray-900 text-hover-primary mb-2'>
                                 {student.lastName + ' ' + student.firstName}
-                              </a>
+                              </span>
                               <div className='fw-semibold fs-7 text-muted'>{student.email}</div>
                             </div>
                           </div>
                         ) : (
                           'Select Student'
-                        )}
-
-                        {formik.touched.supervisor && formik.errors.supervisor && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>
-                              <span role='alert'>{formik.errors.supervisor}</span>
-                            </div>
-                          </div>
                         )}
                       </div>
                       {authorDrpdw && (
@@ -207,10 +199,7 @@ const CreateProject = () => {
                         >
                           <div className='card-header pt-7' id='kt_contacts_list_header'>
                             <div className='row'>
-                              <form
-                                className='d-flex align-items-center position-relative w-100 m-0'
-                                autoComplete='off'
-                              >
+                              <div className='d-flex align-items-center position-relative w-100 m-0'>
                                 <div>
                                   <i className='ki-duotone ki-magnifier fs-3 text-gray-500 position-absolute top-50 ms-5 translate-middle-y'>
                                     <span className='path1'></span>
@@ -220,7 +209,7 @@ const CreateProject = () => {
                                     type='text'
                                     className='form-control form-control-solid ps-13'
                                     name='search'
-                                    value=''
+                                    defaultValue=''
                                     placeholder='Search Students'
                                   />
                                 </div>
@@ -232,7 +221,7 @@ const CreateProject = () => {
                                 >
                                   <KTIcon iconName='cross' className='fs-1' />
                                 </div>
-                              </form>
+                              </div>
                             </div>
                           </div>
                           <div className='card-body pt-5' id='kt_contacts_list_body'>
@@ -252,6 +241,7 @@ const CreateProject = () => {
                                 !IsLoading &&
                                 students.map((student) => (
                                   <div
+                                    key={student._id}
                                     className='d-flex flex-stack py-4 btn btn-active-light-info'
                                     onClick={() => handleSetStudent(student)}
                                   >
@@ -279,6 +269,13 @@ const CreateProject = () => {
                               )}
                               <div className='separator separator-dashed d-none'></div>
                             </div>
+                          </div>
+                        </div>
+                      )}
+                      {formik.touched.student && formik.errors.student && (
+                        <div className='fv-plugins-message-container'>
+                          <div className='fv-help-block'>
+                            <span role='alert'>{formik.errors.student}</span>
                           </div>
                         </div>
                       )}
@@ -332,12 +329,9 @@ const CreateProject = () => {
                               </span>
                             </div>
                             <div className='ms-4'>
-                              <a
-                                href='../../demo1/dist/apps/contacts/view-contact.html'
-                                className='fs-6 fw-bold text-gray-900 text-hover-primary mb-2'
-                              >
+                              <span className='fs-6 fw-bold text-gray-900 text-hover-primary mb-2'>
                                 {supervisor.lastName + ' ' + supervisor.firstName}
-                              </a>
+                              </span>
                               <div className='fw-semibold fs-7 text-muted'>{supervisor.email}</div>
                             </div>
                           </div>
@@ -363,7 +357,7 @@ const CreateProject = () => {
                                     type='text'
                                     className='form-control form-control-solid ps-13'
                                     name='search'
-                                    value=''
+                                    defaultValue=''
                                     placeholder='Search supervisors'
                                   />
                                 </div>
@@ -395,6 +389,7 @@ const CreateProject = () => {
                                 !IsLoading &&
                                 supervisors.map((supervisor) => (
                                   <div
+                                    key={supervisor._id}
                                     className='d-flex flex-stack py-4 btn btn-active-light-info'
                                     onClick={() => handleSetSupervisor(supervisor)}
                                   >

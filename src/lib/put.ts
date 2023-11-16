@@ -45,7 +45,7 @@ const put = async (
           text: 'Network Error',
           icon: 'error',
           buttonsStyling: false,
-          confirmButtonText: 'CLose!',
+          confirmButtonText: 'Close!',
           heightAuto: false,
           customClass: {
             confirmButton: 'btn btn-danger',

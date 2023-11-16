@@ -43,7 +43,7 @@ const post = async (
         text: error.response.data.message,
         icon: 'error',
         buttonsStyling: false,
-        confirmButtonText: 'CLose!',
+        confirmButtonText: 'Close!',
         heightAuto: false,
         customClass: {
           confirmButton: 'btn btn-danger',
@@ -56,7 +56,7 @@ const post = async (
           text: 'Network Error',
           icon: 'error',
           buttonsStyling: false,
-          confirmButtonText: 'CLose!',
+          confirmButtonText: 'Close!',
           heightAuto: false,
           customClass: {
             confirmButton: 'btn btn-danger',
