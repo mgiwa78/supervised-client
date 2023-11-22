@@ -101,8 +101,11 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
                         </div>
                       </div>
                       <div className='card-toolbar'>
-                        <span className={`badge badge-light-warning fw-bold me-auto px-4 py-3`}>
-                          {project?.status}
+                        <span
+                          className={`badge  fw-bold me-auto px-4 py-3`}
+                          style={{backgroundColor: project?.status?.title}}
+                        >
+                          {project?.status?.title}
                         </span>
                       </div>
                     </div>

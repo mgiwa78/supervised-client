@@ -117,6 +117,9 @@ Proposal
           ></SidebarMenuItem>
         </>
       )}
+      <SidebarMenuItemWithSub to='/account' title='Account' fontIcon='bi-user' icon='user'>
+        <SidebarMenuItem to='/account/overview' title='Overview' hasBullet={true} />
+      </SidebarMenuItemWithSub>
     </>
   )
 }

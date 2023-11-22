@@ -20,18 +20,20 @@ const ProjectPage = () => {
   const [project, setProject] = useState<TProject>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [page, setPage] = useState<'documents' | 'overview'>('overview')
+  const getProject = async () => {
+    setIsLoading(true)
+    const RESPONSE = await get(`projects/${projectId}`, token)
 
-  useEffect(() => {
-    const getStudent = async () => {
-      setIsLoading(true)
-      const RESPONSE = await get(`projects/${projectId}`, token)
-
-      if (RESPONSE?.data) {
-        setProject(RESPONSE.data)
-      }
-      setIsLoading(false)
+    if (RESPONSE?.data) {
+      setProject(RESPONSE.data)
     }
-    getStudent()
+    setIsLoading(false)
+  }
+  const refreshProject = () => {
+    getProject()
+  }
+  useEffect(() => {
+    getProject()
   }, [token, projectId])
 
   const projectPageBreadcrumbs: Array<PageLink> = [
@@ -61,8 +63,10 @@ const ProjectPage = () => {
       {project && !isLoading && (
         <>
           <ProjectHeader project={project} setPage={setPage} page={page} />
-          {page === 'overview' && <ProjectOverview />}
-          {page === 'documents' && <ProjectDocuments project={project} />}
+          {/* {page === 'overview' && <ProjectOverview />} */}
+          {page === 'documents' && (
+            <ProjectDocuments refreshProject={refreshProject} project={project} />
+          )}
         </>
       )}
 

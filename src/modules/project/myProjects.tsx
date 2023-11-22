@@ -97,9 +97,10 @@ const MyProjects = () => {
                     </div>
                     <div className='card-toolbar'>
                       <span
-                        className={`badge badge-light-${project?.status} fw-bold me-auto px-4 py-3`}
+                        className={`badge  fw-bold me-auto px-4 py-3`}
+                        style={{backgroundColor: project?.status.color}}
                       >
-                        {project?.status}
+                        {project?.status.title}
                       </span>
                     </div>
                   </div>

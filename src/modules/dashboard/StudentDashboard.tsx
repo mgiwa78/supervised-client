@@ -1,10 +1,110 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {FC} from 'react'
+import {FC, useEffect, useState} from 'react'
 import {PageLink, PageTitle} from '../../_metronic/layout/core'
+import ProjectSupervisors from './components/student/projectSupervisors'
+import {useSelector} from 'react-redux'
+import {selectAuth} from '../../redux/selectors/auth'
+import get from '../../lib/get'
 
-const Dashboard: FC = () => <></>
+const Dashboard = ({projectsAnalytics}: any) => (
+  <div className='row g-5 g-xl-8'>
+    <div className='col-xl-6'>
+      <div className='row g-5 g-xl-8'>
+        <div className='col-xl-6'>
+          <a href='#' className='card bg-body hoverable card-xl-stretch mb-xl-8'>
+            <div className='card-body'>
+              <i className='ki-duotone ki-chart-simple text-primary fs-2x ms-n1'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+                <span className='path3'></span>
+                <span className='path4'></span>
+              </i>
+              <div className='text-gray-900 fw-bold fs-2 mb-2 mt-5'>
+                {projectsAnalytics?.pendingProjects || 0}
+              </div>
+              <div className='fw-semibold text-gray-400'>Pending Projects</div>
+            </div>
+          </a>
+        </div>
+        <div className='col-xl-6'>
+          <a href='#' className='card bg-dark hoverable card-xl-stretch mb-xl-8'>
+            <div className='card-body'>
+              <i className='ki-duotone ki-cheque text-gray-100 fs-2x ms-n1'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+                <span className='path3'></span>
+                <span className='path4'></span>
+                <span className='path5'></span>
+                <span className='path6'></span>
+                <span className='path7'></span>
+              </i>
+              <div className='text-gray-100 fw-bold fs-2 mb-2 mt-5'>
+                {projectsAnalytics?.ongoingProjects || 0}
+              </div>
+              <div className='fw-semibold text-gray-100'>Ongoing Projects</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div className='row g-5 g-xl-8'>
+        <div className='col-xl-6'>
+          <a href='#' className='card bg-info hoverable card-xl-stretch mb-5 mb-xl-8'>
+            <div className='card-body'>
+              <i className='ki-duotone ki-chart-pie-simple text-white fs-2x ms-n1'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+              </i>
+              <div className='text-white fw-bold fs-2 mb-2 mt-5'>
+                {' '}
+                {projectsAnalytics?.approvedProjects || 0}
+              </div>
+              <div className='fw-semibold text-white'>Approved Projects </div>
+            </div>
+          </a>
+        </div>
+        <div className='col-xl-6'>
+          <a href='#' className='card bg-warning hoverable card-xl-stretch mb-xl-8'>
+            <div className='card-body'>
+              <i className='ki-duotone ki-briefcase text-white fs-2x ms-n1'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+              </i>
+              <div className='text-white fw-bold fs-2 mb-2 mt-5'>0</div>
+              <div className='fw-semibold text-white'>Pending Proposals</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div className='col-xl-6'>
+      <ProjectSupervisors projectsSupervisors={projectsAnalytics.projectsSupervisors} />
+    </div>
+  </div>
+)
 
 const StudentDashboard: FC = () => {
+  const {token} = useSelector(selectAuth)
+  const [projectsAnalytics, setProjectsAnalytics] = useState<any>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const getDashboardData = async () => {
+      setIsLoading(true)
+      try {
+        if (token) {
+          const RESPONSE = await get('projects/student/dashboardData', token)
+          setProjectsAnalytics(RESPONSE.data)
+          setIsLoading(false)
+          console.log(RESPONSE.data)
+        }
+      } catch (error) {
+        setIsLoading(false)
+        setProjectsAnalytics([])
+        console.log(error)
+      }
+    }
+    getDashboardData()
+  }, [token])
   const studentDahboard: Array<PageLink> = [
     {
       title: 'Home',
@@ -22,7 +122,7 @@ const StudentDashboard: FC = () => {
   return (
     <>
       <PageTitle breadcrumbs={studentDahboard}>Student Dashboard</PageTitle>
-      <Dashboard />
+      <Dashboard projectsAnalytics={projectsAnalytics} />
     </>
   )
 }

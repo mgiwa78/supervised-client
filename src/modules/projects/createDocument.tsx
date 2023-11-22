@@ -9,20 +9,23 @@ import {KTIcon} from '../../_metronic/helpers'
 import mammoth from 'mammoth'
 import {useDropzone} from 'react-dropzone'
 import {useParams} from 'react-router-dom'
+import {getDownloadURL, ref, uploadBytes} from 'firebase/storage'
+import {storage} from '../../utils/firebase'
+import put from '../../lib/put'
 
 type Props = {
   handleClose: Function
+  refreshProject: Function
 }
 
 const documentSchema = Yup.object().shape({
   title: Yup.string().required('Document Title is required'),
   description: Yup.string().required('Document Description is required'),
-  content: Yup.string().required('Document Description is required'),
 })
 
 const initialValues = {title: '', description: '', defualtTemplate: '', content: ''}
 
-const CreateDocument = ({handleClose}: Props) => {
+const CreateDocument = ({handleClose, refreshProject}: Props) => {
   const {projectId} = useParams()
 
   const [fileContent, setFileContent] = useState<string | null>(null)
@@ -32,32 +35,14 @@ const CreateDocument = ({handleClose}: Props) => {
 
   const [loading, setLoading] = useState(false)
 
-  const onDrop = async (acceptedFiles: Array<File>) => {
-    const file = acceptedFiles[0]
-    console.log(file)
+  const hadlefileFileUpload = async (projectId: string, file: any) => {
+    const fileRefPathRef = ref(storage, `documents/projects/${projectId}/${file.name}`)
+    await uploadBytes(fileRefPathRef, file).then((snapshot) => {})
 
-    if (file) {
-      console.log(file)
-
-      if (
-        file.type === 'application/msword' ||
-        file.type === 'application/docx' ||
-        file.type === 'application/doc' ||
-        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      ) {
-        const AB = await file.arrayBuffer()
-
-        const result = await mammoth.convertToHtml({arrayBuffer: AB})
-
-        setFileContent(result.value)
-        formik.values.content = result.value
-        setFileUploadState('complete')
-      }
-    }
+    return {ref: fileRefPathRef, name: file.name}
   }
 
   const {getRootProps, getInputProps, acceptedFiles} = useDropzone({
-    onDrop,
     accept: {
       'application/*': [
         'vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -68,25 +53,51 @@ const CreateDocument = ({handleClose}: Props) => {
     },
   })
 
-  const files = acceptedFiles.map((file: any) => <li key={file.path}>{file.path}</li>)
+  let files = acceptedFiles.map((file: any) => <li key={file.path}>{file.path}</li>)
 
   const formik = useFormik({
     initialValues,
     validationSchema: documentSchema,
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setLoading(true)
-      console.log('asdda')
+
       try {
         console.log(values)
-        const RESPONSE: any = await post(
-          'documents',
-          {projectId, ...values},
-          token,
-          true,
-          'Document Created'
-        )
+        // const RESPONSE: any = await post(
+        //   `projects/uploadDocument/${projectId}`,
+        //   {projectId, ...values},
+        //   token,
+        //   true,
+        //   'Document Created'
+        // )
+
+        // if (RESPONSE?.data) {
+        const all = acceptedFiles.map(async (e) => {
+          const fileUploadData = await hadlefileFileUpload(projectId, e)
+
+          const a = await getDownloadURL(fileUploadData.ref)
+
+          return {path: a, name: fileUploadData.name}
+        })
+
+        await Promise.all(all)
+          .then(async (data) => {
+            const e = data
+            await put(
+              `projects/uploadDocument/${projectId}`,
+              {files: e},
+              token,
+              true,
+              'Documents Submitted'
+            )
+          })
+          .then(() => {
+            files = []
+            formik.resetForm()
+            refreshProject()
+          })
+        // }
         handleClose()
-        console.log(RESPONSE)
 
         setSubmitting(false)
         setLoading(false)
@@ -188,7 +199,7 @@ const CreateDocument = ({handleClose}: Props) => {
                   )}
                 </div>
 
-                <div className='row-fw mb-5'>
+                {/* <div className='row-fw mb-5'>
                   <label className='form-label fs-6 fw-bold'>Defualt Template</label>
                   <select
                     placeholder='Select Defualt template'
@@ -211,8 +222,8 @@ const CreateDocument = ({handleClose}: Props) => {
                       </div>
                     </div>
                   )}
-                </div>
-                {formik.values.defualtTemplate === 'insert_content' ? (
+                </div> */}
+                {/* {formik.values.defualtTemplate === 'insert_content' ? (
                   <div className='row-fw mb-5'>
                     <label className='form-label fs-6 fw-bold'>Content</label>
 
@@ -233,29 +244,29 @@ const CreateDocument = ({handleClose}: Props) => {
                   </div>
                 ) : (
                   ''
-                )}
-                {formik.values.defualtTemplate === 'upload_word_file' ? (
-                  <div className='row-fw mb-5'>
-                    <label className='form-label fs-6 fw-bold'>
-                      <h4>Files : {files}</h4>
-                    </label>{' '}
-                    <div
-                      {...getRootProps()}
-                      className={`dropzone ${fileUploadState === 'complete' ? 'bg-success' : ''}`}
-                      style={{
-                        border: ` ${fileUploadState === 'complete' ? '1px solid green' : ''}`,
-                      }}
-                    >
-                      <input {...getInputProps()} />
-                      <p>
-                        {fileContent && 'File Added'}
-                        {!fileContent && 'Drag & drop a file here, or click to select one'}
-                      </p>
-                    </div>
+                )} */}
+                {/* {formik.values.defualtTemplate === 'upload_word_file' ? ( */}
+                <div className='row-fw mb-5'>
+                  <label className='form-label fs-6 fw-bold'>
+                    <h4>Files : {files}</h4>
+                  </label>{' '}
+                  <div
+                    {...getRootProps()}
+                    className={`dropzone ${fileUploadState === 'complete' ? 'bg-success' : ''}`}
+                    style={{
+                      border: ` ${fileUploadState === 'complete' ? '1px solid green' : ''}`,
+                    }}
+                  >
+                    <input {...getInputProps()} />
+                    <p>
+                      {fileContent && 'File Added'}
+                      {!fileContent && 'Drag & drop a file here, or click to select one'}
+                    </p>
                   </div>
-                ) : (
+                </div>
+                {/* ) : (
                   ''
-                )}
+                )} */}
 
                 <div className='row-fw mb-5'>
                   <button

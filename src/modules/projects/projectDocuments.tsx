@@ -14,7 +14,7 @@ import deleteReq from '../../lib/delete'
 
 const MySwal = withReactContent(swal.default)
 
-const ProjectDocuments = ({project}: any) => {
+const ProjectDocuments = ({project, refreshProject}: any) => {
   const location = useLocation()
   const user = useSelector(selectUser)
   const {projectId} = useParams()
@@ -27,11 +27,36 @@ const ProjectDocuments = ({project}: any) => {
       icon: 'error',
       buttonsStyling: false,
       confirmButtonText: 'Yes Delete!',
+      showCancelButton: true,
       heightAuto: false,
       customClass: {
         confirmButton: 'btn btn-danger',
+        cancelButton: 'btn btn-secondary',
       },
-    }).then(() => {})
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteFile(document).then((res) => {
+          if (res?.data) {
+            refreshProject()
+            MySwal.fire({
+              title: 'Deleted!',
+              text: 'File has been deleted.',
+              icon: 'success',
+            })
+          } else {
+            MySwal.fire({
+              title: 'Error',
+              text: res?.error,
+              icon: 'error',
+              confirmButtonText: 'Close!',
+              customClass: {
+                confirmButton: 'btn btn-danger',
+              },
+            })
+          }
+        })
+      }
+    })
   }
 
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -44,8 +69,9 @@ const ProjectDocuments = ({project}: any) => {
   }
 
   const deleteFile = async (file: any) => {
-    const RESPONSE = await deleteReq(`project/${projectId}/${file._id}`, token)
+    const RESPONSE = await deleteReq(`projects/${projectId}/${file._id}`, token)
     console.log(RESPONSE)
+    return RESPONSE
   }
 
   // useEffect(() => {
@@ -110,11 +136,11 @@ const ProjectDocuments = ({project}: any) => {
               </option>
             </select>
           </div>
-          {/* {user?.roles.some((role) => role.name === 'Student') && (
+          {user?.roles.some((role) => role.name === 'Student') && (
             <button onClick={() => setIsOpen(true)} className='btn btn-primary btn-sm'>
               Create Document
             </button>
-          )} */}
+          )}
         </div>
       </div>
       <div className='row g-6 g-xl-9 mb-6 mb-xl-9'>
@@ -161,7 +187,7 @@ const ProjectDocuments = ({project}: any) => {
           </div>
         ))}
       </div>
-      {isOpen && <CreateDocument handleClose={handleClose} />}
+      {isOpen && <CreateDocument refreshProject={refreshProject} handleClose={handleClose} />}
     </>
   )
 }

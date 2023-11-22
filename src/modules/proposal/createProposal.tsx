@@ -78,7 +78,16 @@ const CreateProposal = () => {
   ])
   const [items, setItems] = useState([''])
 
-  const {acceptedFiles, getRootProps, getInputProps} = useDropzone()
+  const {acceptedFiles, getRootProps, getInputProps} = useDropzone({
+    accept: {
+      'application/*': [
+        'vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.docx',
+        '.doc',
+        '.pdf',
+      ],
+    },
+  })
 
   let files = acceptedFiles.map((file: any) => (
     <li key={file.path}>
