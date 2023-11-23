@@ -34,7 +34,7 @@ const ProjectSupervisors = ({
                       <div className='text-dark fw-bold text-hover-primary mb-1 fs-6'>
                         <div className='symbol symbol-50px ' style={{marginRight: '10px'}}>
                           <span className='symbol-label bg-secondary text-inverse-secondary fw-bold'>
-                            {projectsSupervisor.supervisor.lastName[0]}
+                            {projectsSupervisor?.supervisor?.lastName[0]}
                           </span>
                         </div>
                         {projectsSupervisor.supervisor.lastName +

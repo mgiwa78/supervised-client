@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux'
 import {selectAuth} from '../../redux/selectors/auth'
 import get from '../../lib/get'
 
-const Dashboard = ({projectsAnalytics}: any) => (
+const Dashboard = ({projectsAnalytics, proposalAnalytics}: any) => (
   <div className='row g-5 g-xl-8'>
     <div className='col-xl-6'>
       <div className='row g-5 g-xl-8'>
@@ -69,8 +69,26 @@ const Dashboard = ({projectsAnalytics}: any) => (
                 <span className='path1'></span>
                 <span className='path2'></span>
               </i>
-              <div className='text-white fw-bold fs-2 mb-2 mt-5'>0</div>
+              <div className='text-white fw-bold fs-2 mb-2 mt-5'>
+                {proposalAnalytics?.pendingProposals}
+              </div>
               <div className='fw-semibold text-white'>Pending Proposals</div>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div className='row g-5 g-xl-8'>
+        <div className='col-xl-6'>
+          <a href='#' className='card bg-success hoverable card-xl-stretch mb-xl-8'>
+            <div className='card-body'>
+              <i className='ki-duotone ki-briefcase text-white fs-2x ms-n1'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+              </i>
+              <div className='text-white fw-bold fs-2 mb-2 mt-5'>
+                {proposalAnalytics?.approvedProposals}
+              </div>
+              <div className='fw-semibold text-white'>Approved Proposals</div>
             </div>
           </a>
         </div>
@@ -85,6 +103,7 @@ const Dashboard = ({projectsAnalytics}: any) => (
 const StudentDashboard: FC = () => {
   const {token} = useSelector(selectAuth)
   const [projectsAnalytics, setProjectsAnalytics] = useState<any>([])
+  const [proposalAnalytics, setProposalAnalytics] = useState<any>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
@@ -92,10 +111,11 @@ const StudentDashboard: FC = () => {
       setIsLoading(true)
       try {
         if (token) {
-          const RESPONSE = await get('projects/student/dashboardData', token)
-          setProjectsAnalytics(RESPONSE.data)
+          const ProjectsAnalytics_RESPONSE = await get('projects/student/dashboardData', token)
+          const ProposalAnalytics_RESPONSE = await get('proposals/student/dashboardData', token)
+          setProjectsAnalytics(ProjectsAnalytics_RESPONSE.data)
+          setProposalAnalytics(ProposalAnalytics_RESPONSE.data)
           setIsLoading(false)
-          console.log(RESPONSE.data)
         }
       } catch (error) {
         setIsLoading(false)
@@ -122,7 +142,7 @@ const StudentDashboard: FC = () => {
   return (
     <>
       <PageTitle breadcrumbs={studentDahboard}>Student Dashboard</PageTitle>
-      <Dashboard projectsAnalytics={projectsAnalytics} />
+      <Dashboard projectsAnalytics={projectsAnalytics} proposalAnalytics={proposalAnalytics} />
     </>
   )
 }

@@ -43,6 +43,7 @@ import Proposal from '../components/viewProposal/Proposal'
 import AllStudents from '../pages/users/students'
 import Workflow from '../pages/workflow/workflow'
 import AccountOverview from '../modules/account/overview'
+import EditAccount from '../modules/account/edit'
 
 const PrivateRoutes = () => {
   const location = useLocation()
@@ -78,6 +79,7 @@ const PrivateRoutes = () => {
 
         <Route path='/account'>
           <Route path='overview' element={<AccountOverview />} />
+          <Route path='edit' element={<EditAccount />} />
         </Route>
 
         <Route path='/proposals'>
