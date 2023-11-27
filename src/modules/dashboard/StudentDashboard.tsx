@@ -95,7 +95,7 @@ const Dashboard = ({projectsAnalytics, proposalAnalytics}: any) => (
       </div>
     </div>
     <div className='col-xl-6'>
-      <ProjectSupervisors projectsSupervisors={projectsAnalytics.projectsSupervisors} />
+      <ProjectSupervisors projectsSupervisors={projectsAnalytics?.projectsSupervisors} />
     </div>
   </div>
 )
@@ -111,11 +111,17 @@ const StudentDashboard: FC = () => {
       setIsLoading(true)
       try {
         if (token) {
+          let ProposalAnalytics_RESPONSE
           const ProjectsAnalytics_RESPONSE = await get('projects/student/dashboardData', token)
-          const ProposalAnalytics_RESPONSE = await get('proposals/student/dashboardData', token)
-          setProjectsAnalytics(ProjectsAnalytics_RESPONSE.data)
-          setProposalAnalytics(ProposalAnalytics_RESPONSE.data)
-          setIsLoading(false)
+
+          if (ProjectsAnalytics_RESPONSE?.data) {
+            ProposalAnalytics_RESPONSE = await get('proposals/student/dashboardData', token)
+
+            setProjectsAnalytics(ProjectsAnalytics_RESPONSE.data)
+          }
+          if (ProposalAnalytics_RESPONSE?.data) {
+            setProposalAnalytics(ProposalAnalytics_RESPONSE.data)
+          }
         }
       } catch (error) {
         setIsLoading(false)

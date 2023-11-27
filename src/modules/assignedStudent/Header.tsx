@@ -74,7 +74,14 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
               <div className='col-3'>
                 <div className='menu-content d-flex align-items-center '>
                   <div className='symbol symbol-50px me-5'>
-                    <img alt='Logo' src={toAbsoluteUrl('/media/avatars/blank.png')} />
+                    <img
+                      alt='Logo'
+                      src={
+                        student?.avatar
+                          ? student?.avatar
+                          : toAbsoluteUrl('/media/avatars/blank.png')
+                      }
+                    />
                   </div>
 
                   <div className='d-flex flex-column'>

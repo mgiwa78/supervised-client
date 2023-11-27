@@ -27,34 +27,31 @@ const ProjectSupervisors = ({
             </tr>
           </thead>
           <tbody>
-            {projectsSupervisors?.length
-              ? projectsSupervisors.map((projectsSupervisor) => (
-                  <tr>
-                    <td>
-                      <div className='text-dark fw-bold text-hover-primary mb-1 fs-6'>
-                        <div className='symbol symbol-50px ' style={{marginRight: '10px'}}>
-                          <span className='symbol-label bg-secondary text-inverse-secondary fw-bold'>
-                            {projectsSupervisor?.supervisor?.lastName[0]}
-                          </span>
-                        </div>
-                        {projectsSupervisor.supervisor.lastName +
-                          '  ' +
-                          projectsSupervisor.supervisor.firstName}
+            {projectsSupervisors?.length &&
+              projectsSupervisors.map((projectsSupervisor) => (
+                <tr>
+                  <td>
+                    <div className='text-dark fw-bold text-hover-primary mb-1 fs-6'>
+                      <div className='symbol symbol-50px ' style={{marginRight: '10px'}}>
+                        <span className='symbol-label bg-secondary text-inverse-secondary fw-bold'>
+                          {projectsSupervisor?.supervisor?.lastName[0]}
+                        </span>
                       </div>
-                      <span className='text-muted fw-semibold d-block fs-7'>
-                        {' '}
-                        {projectsSupervisor.supervisor?.department?.name}
-                      </span>
-                    </td>
-                    <td>
-                      <span className='text-muted fw-semibold d-block fs-7'>
-                        {' '}
-                        {projectsSupervisor.project?.title}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              : ''}
+                      {projectsSupervisor.supervisor.lastName +
+                        '  ' +
+                        projectsSupervisor.supervisor.firstName}
+                    </div>
+                    <span className='text-muted fw-semibold d-block fs-7'>
+                      {projectsSupervisor.supervisor?.department?.name}
+                    </span>
+                  </td>
+                  <td>
+                    <span className='text-muted fw-semibold d-block fs-7'>
+                      {projectsSupervisor.project?.title}
+                    </span>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

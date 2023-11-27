@@ -39,23 +39,6 @@ const put = async (
     return RESPONSE.data
   } catch (error: any) {
     console.log(error)
-    switch (error.message) {
-      case 'Network Error':
-        MySwal.fire({
-          text: 'Network Error',
-          icon: 'error',
-          buttonsStyling: false,
-          confirmButtonText: 'Close!',
-          heightAuto: false,
-          customClass: {
-            confirmButton: 'btn btn-danger',
-          },
-        }).then(() => {})
-        break
-
-      default:
-        break
-    }
 
     switch (error.response?.status) {
       case 401:
@@ -119,34 +102,55 @@ const put = async (
         }).then(() => {})
     }
 
-    if (error.response?.data.errors) {
-      return MySwal.fire({
-        icon: 'error',
-        html:
-          '<div class="text-left align-left">' +
-          error.response.data.errors.map(
-            (e: any) => `<b class="text-capitalize"> ${e.field} </b>: ${e.message}<br>`
-          ) +
-          '</div>',
-        buttonsStyling: false,
-        confirmButtonText: 'Ok!',
-        heightAuto: false,
-        customClass: {
-          confirmButton: 'btn btn-danger',
-        },
-      }).then(() => {})
-    }
-    if (error.response.data.error) {
-      return MySwal.fire({
-        text: error.response.data.error,
-        icon: 'error',
-        buttonsStyling: false,
-        confirmButtonText: 'Ok!',
-        heightAuto: false,
-        customClass: {
-          confirmButton: 'btn btn-danger',
-        },
-      }).then(() => {})
+    if (error.message) {
+      switch (error.message) {
+        case 'Network Error':
+          MySwal.fire({
+            text: 'Network Error',
+            icon: 'error',
+            buttonsStyling: false,
+            confirmButtonText: 'Close!',
+            heightAuto: false,
+            customClass: {
+              confirmButton: 'btn btn-danger',
+            },
+          }).then(() => {})
+          break
+
+        default:
+          break
+      }
+    } else if (error.response?.data.errors) {
+      if (error.response?.data.errors) {
+        return MySwal.fire({
+          icon: 'error',
+          html:
+            '<div class="text-left align-left">' +
+            error.response.data.errors.map(
+              (e: any) => `<b class="text-capitalize"> ${e.field} </b>: ${e.message}<br>`
+            ) +
+            '</div>',
+          buttonsStyling: false,
+          confirmButtonText: 'Ok!',
+          heightAuto: false,
+          customClass: {
+            confirmButton: 'btn btn-danger',
+          },
+        }).then(() => {})
+      }
+    } else if (error.response.data.error) {
+      if (error.response.data.error) {
+        return MySwal.fire({
+          text: error.response.data.error,
+          icon: 'error',
+          buttonsStyling: false,
+          confirmButtonText: 'Ok!',
+          heightAuto: false,
+          customClass: {
+            confirmButton: 'btn btn-danger',
+          },
+        }).then(() => {})
+      }
     } else {
       return MySwal.fire({
         text: error.message,

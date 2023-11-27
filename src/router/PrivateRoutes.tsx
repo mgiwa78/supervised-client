@@ -44,6 +44,7 @@ import AllStudents from '../pages/users/students'
 import Workflow from '../pages/workflow/workflow'
 import AccountOverview from '../modules/account/overview'
 import EditAccount from '../modules/account/edit'
+import FAQ from '../pages/faq/all'
 
 const PrivateRoutes = () => {
   const location = useLocation()
@@ -118,7 +119,6 @@ const PrivateRoutes = () => {
           </Route>
         </Route>
 
-        <Route path='workflow' element={<Workflow />} />
         <Route path='students'>
           {/* <Route path='users'>
             <Route index element={<Navigate to='/users/all' />} />
@@ -148,6 +148,9 @@ const PrivateRoutes = () => {
             </>
           }
         />
+
+        <Route path='workflow' element={<Workflow />} />
+        <Route path='faq' element={<FAQ />} />
       </Route>
     </Routes>
   )

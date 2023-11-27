@@ -2,6 +2,8 @@ import clsx from 'clsx'
 import {KTIcon, toAbsoluteUrl} from '../../../helpers'
 import {HeaderNotificationsMenu, HeaderUserMenu, Search, ThemeModeSwitcher} from '../../../partials'
 import {useLayout} from '../../core'
+import {useDispatch, useSelector} from 'react-redux'
+import {RootState} from '../../../../redux/store'
 
 const itemClass = 'ms-1 ms-md-4'
 const btnClass =
@@ -10,6 +12,8 @@ const userAvatarClass = 'symbol-35px'
 const btnIconClass = 'fs-2'
 
 const Navbar = () => {
+  const dispatch = useDispatch()
+  const currentUser = useSelector((state: RootState) => state.auth.user)
   const {config} = useLayout()
   return (
     <div className='app-navbar flex-shrink-0'>
@@ -53,7 +57,12 @@ const Navbar = () => {
           data-kt-menu-attach='parent'
           data-kt-menu-placement='bottom-end'
         >
-          <img src={toAbsoluteUrl('/media/avatars/blank.png')} alt='' />
+          <img
+            src={
+              currentUser?.avatar ? currentUser?.avatar : toAbsoluteUrl('/media/avatars/blank.png')
+            }
+            alt=''
+          />
         </div>
         <HeaderUserMenu />
       </div>

@@ -6,6 +6,10 @@ import User, {UserEdit} from '../../types/User'
 import get from '../../lib/get'
 import {useSelector} from 'react-redux'
 import {selectAuth} from '../../redux/selectors/auth'
+import put from '../../lib/put'
+import {getDownloadURL, ref, uploadBytes} from 'firebase/storage'
+import {storage} from '../../utils/firebase'
+import {userInfo} from 'os'
 
 const profileDetailsSchema = Yup.object().shape({
   firstName: Yup.string().required('First name is required'),
@@ -18,6 +22,7 @@ const initialValues = {
   createdAt: '',
   department: {_id: '', name: ''},
   email: '',
+  avatar: '',
   firstName: '',
   contactNumber: '',
   lastName: '',
@@ -31,6 +36,8 @@ const EditAccount: React.FC = () => {
   const [profile, setProfile] = useState<User>()
 
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [newProfile, setNewProfile] = useState<File>()
+  const [isSubmitting, setSubmitting] = useState<boolean>(true)
   const {token} = useSelector(selectAuth)
 
   const updateData = (fieldsToUpdate: Partial<User>): void => {
@@ -63,20 +70,49 @@ const EditAccount: React.FC = () => {
     getProfile()
   }, [token])
 
+  const updateProfileImage = (e: any) => {
+    console.log(e.target.files)
+    const file = e.target.files[0]
+
+    if (file) {
+      setNewProfile(file)
+    }
+  }
+
+  const hadlefileProfileUpload = async (userId: string, image: any) => {
+    const fileRefPathRef = ref(storage, `profiles/${profile}/profile`)
+    await uploadBytes(fileRefPathRef, image).then((snapshot) => {})
+    const path = await getDownloadURL(fileRefPathRef)
+    return path
+  }
+
   const [loading, setLoading] = useState(false)
   const formik = useFormik<User>({
     initialValues,
     validationSchema: profileDetailsSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       setLoading(true)
-      // setTimeout(() => {
-      //   values.communications.email = data.communications.email
-      //   values.communications.phone = data.communications.phone
-      //   values.allowMarketing = data.allowMarketing
-      //   const updatedData = Object.assign(data, values)
-      //   setData(updatedData)
-      //   setLoading(false)
-      // }, 1000)
+
+      console.log(values)
+      try {
+        let profilePath
+        if (newProfile) {
+          profilePath = await hadlefileProfileUpload(values._id, newProfile)
+        }
+        const RESPONSE: any = await put(
+          'users/myProfile/update',
+          {...values, ...(profilePath && {avatar: profilePath})},
+          token,
+          true,
+          'Profile Updated'
+        )
+        if (1) {
+          formik.values = initialValues
+        }
+      } catch (error) {
+        setSubmitting(false)
+        setLoading(false)
+      }
     },
   })
 
@@ -113,7 +149,11 @@ const EditAccount: React.FC = () => {
                       <div
                         className='image-input-wrapper w-125px h-125px'
                         style={{
-                          backgroundImage: `url(${toAbsoluteUrl('/media/avatars/blank.png')})`,
+                          backgroundImage: `url(${
+                            profile?.avatar
+                              ? profile?.avatar
+                              : toAbsoluteUrl('/media/avatars/blank.png')
+                          })`,
                         }}
                       ></div>
                     </div>
@@ -124,9 +164,9 @@ const EditAccount: React.FC = () => {
                     <div className='col-12'>
                       <input
                         type='file'
+                        onChange={(e) => updateProfileImage(e)}
                         className='form-control form-control-lg form-control-solid'
                         placeholder='Last name'
-                        {...formik.getFieldProps('avatar')}
                       />
                       {formik.touched.avatar && formik.errors.avatar && (
                         <div className='fv-plugins-message-container'>
