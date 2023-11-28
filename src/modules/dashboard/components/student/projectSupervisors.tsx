@@ -28,8 +28,8 @@ const ProjectSupervisors = ({
           </thead>
           <tbody>
             {projectsSupervisors?.length &&
-              projectsSupervisors.map((projectsSupervisor) => (
-                <tr>
+              projectsSupervisors.map((projectsSupervisor, index) => (
+                <tr key={index}>
                   <td>
                     <div className='text-dark fw-bold text-hover-primary mb-1 fs-6'>
                       <div className='symbol symbol-50px ' style={{marginRight: '10px'}}>

@@ -12,7 +12,6 @@ import {SupervisorDashboard} from '../../modules/dashboard/InstructorDashboard'
 
 const DashboardPage: FC = () => {
   const auth = useSelector(selectAuth)
-  console.log(auth.user?.roles.some((role) => role.name === 'Superadmin'))
   return (
     <>
       {auth.user?.roles.some((role) => role.name === 'Superadmin') ? <AdminDashboard /> : ''}
