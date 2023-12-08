@@ -7,14 +7,16 @@ import {useFormik} from 'formik'
 import {useEffect, useState} from 'react'
 import get from '../../lib/get'
 import TFaqCategories from '../../types/faqCategories'
+import put from '../../lib/put'
 
 type Props = {
-  setCreateNewFAQ: Function
+  setFAQ: Function
   faqCategories: Array<TFaqCategories>
   refresh: Function
+  faq: any
 }
 const initialValues = {
-  title: '',
+  category: '',
   answer: '',
   question: '',
 }
@@ -24,23 +26,29 @@ const createFaqSchema = Yup.object().shape({
   category: Yup.string().required('Category is required'),
 })
 
-const CreateFaq = ({setCreateNewFAQ, faqCategories, refresh}: Props) => {
+const CreateFaq = ({setFAQ, faqCategories, refresh, faq = null}: Props) => {
   const token = useSelector(selectToken)
   const [IsLoading, setIsLoading] = useState<boolean>(false)
-
+  console.log(faq)
   const formik = useFormik({
-    initialValues,
+    initialValues: faq._id
+      ? {category: faq?.category, question: faq?.question, answer: faq?.answer}
+      : initialValues,
     validationSchema: createFaqSchema,
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setIsLoading(true)
       try {
-        await post('faqs', {...values}, token, true, 'FAQ Created')
+        if (faq._id) {
+          await put(`faqs/${faq._id}`, {...values}, token, true, 'FAQ Updated')
+        } else {
+          await post('faqs', {...values}, token, true, 'FAQ Created')
+        }
 
         if (1) {
           formik.values = initialValues
           refresh()
         }
-        setCreateNewFAQ(false)
+        setFAQ(false)
 
         setSubmitting(false)
         setIsLoading(false)
@@ -76,19 +84,19 @@ const CreateFaq = ({setCreateNewFAQ, faqCategories, refresh}: Props) => {
             {/* end::Modal Backdrop */}
             <div className='modal-header pt-7' id='kt_chat_contacts_header'>
               <div className='modal-title'>
-                <h2> Create Category</h2>
+                <h2> {faq === 'new' && 'Create Faq'}</h2>
+                <h2> {faq._id && 'Update Faq'}</h2>
               </div>
               <div
                 className='btn btn-icon btn-sm btn-active-icon-primary'
                 data-kt-users-modal-action='close'
                 style={{cursor: 'pointer'}}
-                onClick={() => setCreateNewFAQ(false)}
+                onClick={() => setFAQ(false)}
               >
                 <KTIcon iconName='cross' className='fs-1' />
               </div>
             </div>
-            {/* begin::Modal body */}
-            {/* Projects, documents and files which haven't been edited or reviewed */}
+
             <div className='modal-body scroll-y mx-5 mx-xl-10 '>
               <div className='card-body'></div>
               <form
@@ -193,6 +201,7 @@ const CreateFaq = ({setCreateNewFAQ, faqCategories, refresh}: Props) => {
                     type='reset'
                     data-kt-contacts-type='cancel'
                     className='btn btn-light me-3'
+                    onClick={() => setFAQ(false)}
                   >
                     Cancel
                   </button>
@@ -209,7 +218,9 @@ const CreateFaq = ({setCreateNewFAQ, faqCategories, refresh}: Props) => {
                       <span className='path4'></span>
                       <span className='path5'></span>
                     </i>
-                    {!IsLoading && <span className='indicator-label'>Create</span>}
+                    {!IsLoading && (
+                      <span className='indicator-label'>{faq._id ? 'Update' : 'Create'}</span>
+                    )}
                     {IsLoading && (
                       <span className='indicator-progress' style={{display: 'block'}}>
                         Please wait...

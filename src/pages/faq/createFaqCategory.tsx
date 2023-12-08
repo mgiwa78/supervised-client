@@ -7,6 +7,7 @@ import {useFormik} from 'formik'
 import {useEffect, useState} from 'react'
 import get from '../../lib/get'
 import TFaqCategories from '../../types/faqCategories'
+import put from '../../lib/put'
 
 const initialValues = {
   title: '',
@@ -15,22 +16,26 @@ const createFaqCategorySchema = Yup.object().shape({
   title: Yup.string().required('Category Title is required'),
 })
 
-const CreateFaqCategory = ({setCreateNew, refreshWorkflow}: any) => {
+const CreateFaqCategory = ({setCategory, refresh, category}: any) => {
   const token = useSelector(selectToken)
   const [IsLoading, setIsLoading] = useState<boolean>(false)
 
   const formik = useFormik({
-    initialValues,
+    initialValues: category._id ? {title: category?.title} : initialValues,
     validationSchema: createFaqCategorySchema,
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setIsLoading(true)
       try {
-        await post('faqCategories', {...values}, token, true, 'Category Created')
+        if (category._id) {
+          await put(`faqCategories/${category._id}`, {...values}, token, true, 'Category Updated')
+        } else {
+          await post('faqCategories', {...values}, token, true, 'Category Created')
+        }
         if (1) {
           formik.values = initialValues
-          refreshWorkflow()
+          refresh()
         }
-        setCreateNew(false)
+        setCategory(false)
 
         setSubmitting(false)
         setIsLoading(false)
@@ -66,13 +71,13 @@ const CreateFaqCategory = ({setCreateNew, refreshWorkflow}: any) => {
             {/* end::Modal Backdrop */}
             <div className='modal-header pt-7' id='kt_chat_contacts_header'>
               <div className='modal-title'>
-                <h2> Create Category</h2>
+                <h2>{category._id ? 'Update Category' : 'Create Category'}</h2>
               </div>
               <div
                 className='btn btn-icon btn-sm btn-active-icon-primary'
                 data-kt-users-modal-action='close'
                 style={{cursor: 'pointer'}}
-                onClick={() => setCreateNew(false)}
+                onClick={() => setCategory(null)}
               >
                 <KTIcon iconName='cross' className='fs-1' />
               </div>
@@ -122,6 +127,7 @@ const CreateFaqCategory = ({setCreateNew, refreshWorkflow}: any) => {
                     type='reset'
                     data-kt-contacts-type='cancel'
                     className='btn btn-light me-3'
+                    onClick={() => setCategory(null)}
                   >
                     Cancel
                   </button>
@@ -138,7 +144,9 @@ const CreateFaqCategory = ({setCreateNew, refreshWorkflow}: any) => {
                       <span className='path4'></span>
                       <span className='path5'></span>
                     </i>
-                    {!IsLoading && <span className='indicator-label'>Create</span>}
+                    {!IsLoading && (
+                      <span className='indicator-label'>{category._id ? 'Update' : 'Create'}</span>
+                    )}
                     {IsLoading && (
                       <span className='indicator-progress' style={{display: 'block'}}>
                         Please wait...
