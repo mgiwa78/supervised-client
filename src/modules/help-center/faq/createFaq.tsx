@@ -1,41 +1,55 @@
 import * as Yup from 'yup'
-import post from '../../lib/post'
+import post from '../../../lib/post'
 import {useSelector} from 'react-redux'
-import {selectToken} from '../../redux/selectors/auth'
-import {KTIcon} from '../../_metronic/helpers'
+import {selectToken} from '../../../redux/selectors/auth'
+import {KTIcon} from '../../../_metronic/helpers'
 import {useFormik} from 'formik'
 import {useEffect, useState} from 'react'
-import get from '../../lib/get'
-import TFaqCategories from '../../types/faqCategories'
-import put from '../../lib/put'
+import get from '../../../lib/get'
+import TFaqCategories from '../../../types/faqCategories'
+import put from '../../../lib/put'
 
-const initialValues = {
-  title: '',
+type Props = {
+  setFAQ: Function
+  faqCategories: Array<TFaqCategories>
+  refresh: Function
+  faq: any
 }
-const createFaqCategorySchema = Yup.object().shape({
-  title: Yup.string().required('Category Title is required'),
+const initialValues = {
+  category: '',
+  answer: '',
+  question: '',
+}
+const createFaqSchema = Yup.object().shape({
+  question: Yup.string().required('Qestion is required'),
+  answer: Yup.string().required('Answer is required'),
+  category: Yup.string().required('Category is required'),
 })
 
-const CreateFaqCategory = ({setCategory, refresh, category}: any) => {
+const CreateFaq = ({setFAQ, faqCategories, refresh, faq = null}: Props) => {
   const token = useSelector(selectToken)
   const [IsLoading, setIsLoading] = useState<boolean>(false)
 
+  console.log(faq)
   const formik = useFormik({
-    initialValues: category._id ? {title: category?.title} : initialValues,
-    validationSchema: createFaqCategorySchema,
+    initialValues: faq._id
+      ? {category: faq?.category, question: faq?.question, answer: faq?.answer}
+      : initialValues,
+    validationSchema: createFaqSchema,
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setIsLoading(true)
       try {
-        if (category._id) {
-          await put(`faqCategories/${category._id}`, {...values}, token, true, 'Category Updated')
+        if (faq._id) {
+          await put(`faqs/${faq._id}`, {...values}, token, true, 'FAQ Updated')
         } else {
-          await post('faqCategories', {...values}, token, true, 'Category Created')
+          await post('faqs', {...values}, token, true, 'FAQ Created')
         }
+
         if (1) {
           formik.values = initialValues
           refresh()
         }
-        setCategory(false)
+        setFAQ(false)
 
         setSubmitting(false)
         setIsLoading(false)
@@ -71,19 +85,19 @@ const CreateFaqCategory = ({setCategory, refresh, category}: any) => {
             {/* end::Modal Backdrop */}
             <div className='modal-header pt-7' id='kt_chat_contacts_header'>
               <div className='modal-title'>
-                <h2>{category._id ? 'Update Category' : 'Create Category'}</h2>
+                <h2> {faq === 'new' && 'Create Faq'}</h2>
+                <h2> {faq._id && 'Update Faq'}</h2>
               </div>
               <div
                 className='btn btn-icon btn-sm btn-active-icon-primary'
                 data-kt-users-modal-action='close'
                 style={{cursor: 'pointer'}}
-                onClick={() => setCategory(null)}
+                onClick={() => setFAQ(false)}
               >
                 <KTIcon iconName='cross' className='fs-1' />
               </div>
             </div>
-            {/* begin::Modal body */}
-            {/* Projects, documents and files which haven't been edited or reviewed */}
+
             <div className='modal-body scroll-y mx-5 mx-xl-10 '>
               <div className='card-body'></div>
               <form
@@ -93,14 +107,14 @@ const CreateFaqCategory = ({setCategory, refresh, category}: any) => {
                 id='workflow_creation_form'
               >
                 <div className='row mb-7 fv-plugins-icon-container'>
-                  <div className='col-12'>
+                  <div className='col-6'>
                     <label className='fs-6 fw-semibold form-label mt-3'>
-                      <span className='required'>Title</span>
+                      <span className='required'>Question</span>
                       <span
                         className='ms-1'
                         data-bs-toggle='tooltip'
-                        aria-label='Enter the category title.'
-                        data-bs-original-title='Enter the category title.'
+                        aria-label='FAQ question.'
+                        data-bs-original-question='FAQ question.'
                         data-kt-initialized='1'
                       >
                         <i className='ki-duotone ki-information fs-7'>
@@ -112,11 +126,72 @@ const CreateFaqCategory = ({setCategory, refresh, category}: any) => {
                     </label>
                     <input
                       type='text'
-                      {...formik.getFieldProps('title')}
+                      {...formik.getFieldProps('question')}
                       className='form-control form-control-solid'
-                      name='title'
-                      placeholder='Category title'
+                      placeholder='FAQ Question'
                     />
+                    <div className='fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback'></div>
+                  </div>
+                  <div className='col-6'>
+                    <label className='fs-6 fw-semibold form-label mt-3'>
+                      <span className='required'>Category</span>
+                      <span
+                        className='ms-1'
+                        data-bs-toggle='tooltip'
+                        aria-label='Select category'
+                        data-bs-original-title='Select the category'
+                        data-kt-initialized='1'
+                      >
+                        <i className='ki-duotone ki-information fs-7'>
+                          <span className='path1'></span>
+                          <span className='path2'></span>
+                          <span className='path3'></span>
+                        </i>
+                      </span>
+                    </label>
+                    <select
+                      {...formik.getFieldProps('category')}
+                      className='form-control form-control-solid'
+                      name='category'
+                      placeholder='FAQ Category'
+                    >
+                      <option value=''>Select Category</option>
+                      {faqCategories &&
+                        faqCategories?.map((cat: TFaqCategories) => (
+                          <option key={cat._id} value={cat._id}>
+                            {cat.title}
+                          </option>
+                        ))}
+                    </select>
+                    <div className='fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback'></div>
+                  </div>
+                </div>
+                <div className='row mb-7 fv-plugins-icon-container'>
+                  <div className='col-12'>
+                    <label className='fs-6 fw-semibold form-label mt-3'>
+                      <span className='required'>Answer</span>
+                      <span
+                        className='ms-1'
+                        data-bs-toggle='tooltip'
+                        aria-label='FAQ Answer.'
+                        data-bs-original-title='FAQ answer.'
+                        data-kt-initialized='1'
+                      >
+                        <i className='ki-duotone ki-information fs-7'>
+                          <span className='path1'></span>
+                          <span className='path2'></span>
+                          <span className='path3'></span>
+                        </i>
+                      </span>
+                    </label>
+                    <textarea
+                      {...formik.getFieldProps('answer')}
+                      className='form-control form-control-solid'
+                      name='answer'
+                      placeholder='FAQ answer'
+                      cols={30}
+                      rows={5}
+                    ></textarea>
                     <div className='fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback'></div>
                   </div>
                 </div>
@@ -127,7 +202,7 @@ const CreateFaqCategory = ({setCategory, refresh, category}: any) => {
                     type='reset'
                     data-kt-contacts-type='cancel'
                     className='btn btn-light me-3'
-                    onClick={() => setCategory(null)}
+                    onClick={() => setFAQ(false)}
                   >
                     Cancel
                   </button>
@@ -145,7 +220,7 @@ const CreateFaqCategory = ({setCategory, refresh, category}: any) => {
                       <span className='path5'></span>
                     </i>
                     {!IsLoading && (
-                      <span className='indicator-label'>{category._id ? 'Update' : 'Create'}</span>
+                      <span className='indicator-label'>{faq._id ? 'Update' : 'Create'}</span>
                     )}
                     {IsLoading && (
                       <span className='indicator-progress' style={{display: 'block'}}>
@@ -170,4 +245,4 @@ const CreateFaqCategory = ({setCategory, refresh, category}: any) => {
   )
 }
 
-export default CreateFaqCategory
+export default CreateFaq

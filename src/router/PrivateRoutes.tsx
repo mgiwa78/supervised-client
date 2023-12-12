@@ -44,7 +44,8 @@ import AllStudents from '../pages/users/students'
 import Workflow from '../pages/workflow/workflow'
 import AccountOverview from '../modules/account/overview'
 import EditAccount from '../modules/account/edit'
-import FAQ from '../pages/faq/all'
+import FAQ from '../modules/help-center/faq/all'
+import HelpCenter from '../modules/help-center'
 
 const PrivateRoutes = () => {
   const location = useLocation()
@@ -150,7 +151,7 @@ const PrivateRoutes = () => {
         />
 
         <Route path='workflow' element={<Workflow />} />
-        <Route path='faq' element={<FAQ />} />
+        <Route path='help-center' element={<HelpCenter />} />
       </Route>
     </Routes>
   )
