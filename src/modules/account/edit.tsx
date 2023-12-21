@@ -30,6 +30,9 @@ const initialValues = {
   supervisor: '',
   updatedAt: '',
   _id: '',
+  notification: {
+    email: false,
+  },
 }
 const EditAccount: React.FC = () => {
   const [data, setData] = useState<User>()
@@ -58,6 +61,7 @@ const EditAccount: React.FC = () => {
           formik.values.lastName = RESPONSE.data?.lastName
           formik.values.email = RESPONSE.data?.email
           formik.values.contactNumber = RESPONSE.data?.contactNumber
+          formik.values.notification = RESPONSE.data?.notification
 
           setIsLoading(false)
         }
@@ -99,6 +103,7 @@ const EditAccount: React.FC = () => {
         if (newProfile) {
           profilePath = await hadlefileProfileUpload(values._id, newProfile)
         }
+
         const RESPONSE: any = await put(
           'users/myProfile/update',
           {...values, ...(profilePath && {avatar: profilePath})},
@@ -109,6 +114,8 @@ const EditAccount: React.FC = () => {
         if (1) {
           formik.values = initialValues
         }
+        setSubmitting(false)
+        setLoading(false)
       } catch (error) {
         setSubmitting(false)
         setLoading(false)
@@ -230,6 +237,23 @@ const EditAccount: React.FC = () => {
                     <div className='fv-help-block'>{formik.errors.email}</div>
                   </div>
                 )}
+              </div>
+            </div>
+            <div className='row mb-6'>
+              <label className='col-lg-2 col-form-label required fw-bold fs-6'>Notification</label>
+
+              <div className='col-lg-10 fv-row'>
+                <div className='form-check form-check-custom form-check-solid'>
+                  <input
+                    className='form-check-input'
+                    type='checkbox'
+                    id='inlineCheckbox3'
+                    {...formik.getFieldProps('notification.email')}
+                  />
+                  <label className='form-check-label fw-bold' htmlFor='inlineCheckbox3'>
+                    Email
+                  </label>
+                </div>
               </div>
             </div>
 

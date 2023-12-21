@@ -13,6 +13,9 @@ type User = {
   lastName: string
   roles?: Array<Role>
   rolesState?: any
+  notification: {
+    email: boolean
+  }
 }
 export type UserEdit = {
   _id?: string
@@ -27,6 +30,9 @@ export type UserEdit = {
   lastName?: string
   roles?: Array<Role>
   rolesState?: any
+  notification: {
+    email: boolean
+  }
 }
 
 export default User

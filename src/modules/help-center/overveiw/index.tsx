@@ -3,6 +3,7 @@ import TFaq from '../../../types/faq'
 import get from '../../../lib/get'
 import {useSelector} from 'react-redux'
 import {selectToken} from '../../../redux/selectors/auth'
+import TTicket from '../../../types/ticket'
 
 type Props = {
   setPage: Function
@@ -10,6 +11,7 @@ type Props = {
 const HelpCenterOverview = ({setPage}: Props) => {
   const [faqs, setFaqs] = useState<Array<TFaq>>()
   const token = useSelector(selectToken)
+  const [tickets, setTickets] = useState<Array<TTicket>>()
 
   const getFaq = async () => {
     const RESPONSE = await get('faqs', token)
@@ -19,7 +21,16 @@ const HelpCenterOverview = ({setPage}: Props) => {
     }
   }
 
+  const getTicket = async () => {
+    const RESPONSE = await get('tickets', token)
+
+    if (RESPONSE?.data) {
+      setTickets(RESPONSE.data)
+    }
+  }
+
   useEffect(() => {
+    getTicket()
     getFaq()
   }, [token])
   return (
@@ -43,33 +54,36 @@ const HelpCenterOverview = ({setPage}: Props) => {
                 </i>
               </div>
             </div>
-            <div className='m-0'>
-              <div
-                className='d-flex align-items-center collapsible py-3 toggle mb-0 collapsed'
-                data-bs-toggle='collapse'
-                data-bs-target='#kt_support_1_1'
-                aria-expanded='false'
-              >
-                <div className='ms-n1 me-5'>
-                  <i className='ki-duotone ki-down toggle-on text-primary fs-2'></i>
-                  <i className='ki-duotone ki-right toggle-off fs-2'></i>
-                </div>
-                <div className='d-flex align-items-center flex-wrap'>
-                  <h3 className='text-gray-800 fw-semibold cursor-pointer me-3 mb-2'>
-                    I am having issues when i assign multiple roles to one user?
-                  </h3>
-                  <span className='badge badge-light-success my-1 d-block'>Resolved</span>
-                </div>
-              </div>
-              <div id='kt_support_1_1' className='fs-6 ms-10 collapse'>
-                <div className='mb-4'>
-                  <span className='text-muted fw-semibold fs-5'>
-                    Supervised allows for multible and systematic role assignment, try checking what
-                    permissions are assigned for each roles, maybe there's a conflict?
-                  </span>{' '}
-                </div>
-              </div>
-            </div>
+            {tickets
+              ? tickets.map((ticket) => (
+                  <>
+                    <div className='m-0'>
+                      <div
+                        className='d-flex align-items-center collapsible py-3 toggle mb-0 collapsed'
+                        data-bs-toggle='collapse'
+                        data-bs-target={`#kt_support_${ticket._id}`}
+                        aria-expanded='false'
+                      >
+                        <div className='ms-n1 me-5'>
+                          <i className='ki-duotone ki-down toggle-on text-primary fs-2'></i>
+                          <i className='ki-duotone ki-right toggle-off fs-2'></i>
+                        </div>
+                        <div className='d-flex align-items-center flex-wrap'>
+                          <h3 className='text-gray-800 fw-semibold cursor-pointer me-3 mb-2'>
+                            {ticket.subject}
+                          </h3>
+                          <span className='badge badge-light-success my-1 d-block'>Resolved</span>
+                        </div>
+                      </div>
+                      <div id={`kt_support_${ticket._id}`} className='fs-6 ms-10 collapse'>
+                        <div className='mb-4'>
+                          <span className='text-muted fw-semibold fs-5'>{ticket.description}</span>{' '}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ))
+              : ''}
           </div>
         </div>
       </div>

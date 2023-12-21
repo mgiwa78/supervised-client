@@ -28,7 +28,7 @@ const ProjectSupervisors = ({
           </thead>
           <tbody>
             {projectsSupervisors?.length &&
-              projectsSupervisors.map((projectsSupervisor, index) => (
+              projectsSupervisors.slice(0, 6).map((projectsSupervisor, index) => (
                 <tr key={index}>
                   <td>
                     <div className='text-dark fw-bold text-hover-primary mb-1 fs-6'>

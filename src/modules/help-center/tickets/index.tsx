@@ -1,7 +1,28 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import CreateTicket from './createTicket'
+import {useSelector} from 'react-redux'
+import {selectToken} from '../../../redux/selectors/auth'
+import TTicket from '../../../types/ticket'
+import get from '../../../lib/get'
 
-const HelpCenterTickets = () => {
+type Prop = {
+  handleViewTicket: Function
+}
+const HelpCenterTickets = ({handleViewTicket}: Prop) => {
+  const token = useSelector(selectToken)
+  const [tickets, setTickets] = useState<Array<TTicket>>()
+
+  const getTicket = async () => {
+    const RESPONSE = await get('tickets', token)
+
+    if (RESPONSE?.data) {
+      setTickets(RESPONSE.data)
+    }
+  }
+
+  useEffect(() => {
+    getTicket()
+  }, [token])
   return (
     <>
       <div className='card'>
@@ -26,31 +47,38 @@ const HelpCenterTickets = () => {
                 </form>
                 <h1 className='text-dark mb-10'>Public Tickets</h1>
                 <div className='mb-10'>
-                  <div className='d-flex mb-10'>
-                    <i className='ki-duotone ki-file-added fs-2x me-5 ms-n1 mt-2 text-success'>
-                      <span className='path1'></span>
-                      <span className='path2'></span>
-                    </i>
-                    <div className='d-flex flex-column'>
-                      <div className='d-flex align-items-center mb-2'>
-                        <a
-                          href='../../demo1/dist/apps/support-center/tickets/view.html'
-                          className='text-dark text-hover-primary fs-4 me-3 fw-semibold'
-                        >
-                          How to Create project workflow?
-                        </a>
-                        <span className='badge badge-light-warning my-1'>Pending</span>
+                  {tickets?.length > 1 ? (
+                    tickets?.map((ticket) => (
+                      <div
+                        style={{cursor: 'pointer'}}
+                        className='d-flex mb-10'
+                        onClick={() => handleViewTicket(ticket)}
+                      >
+                        <i className='ki-duotone ki-file-added fs-2x me-5 ms-n1 mt-2 text-success'>
+                          <span className='path1'></span>
+                          <span className='path2'></span>
+                        </i>
+                        <div className='d-flex flex-column'>
+                          <div className='d-flex align-items-center mb-2'>
+                            <a className='text-dark text-hover-primary fs-4 me-3 fw-semibold'>
+                              {ticket.subject}
+                            </a>
+                            <span className='badge badge-light-warning my-1'>
+                              {' '}
+                              {ticket?.status || 'Pending'}
+                            </span>
+                          </div>
+                          <span className='text-muted fw-semibold fs-6'>{ticket.description}</span>
+                        </div>
                       </div>
-                      <span className='text-muted fw-semibold fs-6'>
-                        By supervised to save tons and more to time money projects are listed
-                        amazing
-                        <br />
-                        outstanding projects are listed
-                      </span>
+                    ))
+                  ) : (
+                    <div className='d-flex mb-10'>
+                      <span className='text-muted fw-semibold fs-6'>No Tickets</span>
                     </div>
-                  </div>
+                  )}
                 </div>
-                <ul className='pagination'>
+                {/* <ul className='pagination'>
                   <li className='page-item previous disabled'>
                     <a href='#' className='page-link'>
                       <i className='previous'></i>
@@ -91,7 +119,7 @@ const HelpCenterTickets = () => {
                       <i className='next'></i>
                     </a>
                   </li>
-                </ul>
+                </ul> */}
               </div>
             </div>
           </div>

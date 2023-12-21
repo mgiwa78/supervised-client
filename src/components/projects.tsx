@@ -84,7 +84,7 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
                 typeof project.student === 'object' ? project.student._id : project.student
 
               return (
-                <div className='col-md-6 col-xl-4'>
+                <div className='col-md-6 col-xl-4' key={project._id}>
                   <Link
                     to={
                       currentUser?.roles.some((role) => role.name === 'Supervisor') &&

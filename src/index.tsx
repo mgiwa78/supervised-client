@@ -1,5 +1,6 @@
 import {createRoot} from 'react-dom/client'
 // Axios
+import './index.css'
 import axios from 'axios'
 import {Chart, registerables} from 'chart.js'
 import {QueryClient, QueryClientProvider} from 'react-query'

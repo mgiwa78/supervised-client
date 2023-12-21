@@ -8,9 +8,17 @@ import {RootState} from '../../redux/store'
 import {useSelector} from 'react-redux'
 import TFaq from '../../types/faq'
 import Ticket from './tickets/ticket'
+import TTicket from '../../types/ticket'
+import CreateTicketCategory from './tickets/createTicketCategory'
 
 const HelpCenter = () => {
   const [FAQ, setFAQ] = useState<'new' | 'close' | TFaq>(null)
+  const [TICKET, setTICKET] = useState<null | TTicket>(null)
+
+  const handleViewTicket = (ticket: TTicket) => {
+    setPage('ticket')
+    setTICKET(ticket)
+  }
 
   const currentUser = useSelector((state: RootState) => state.auth.user)
   const [page, setPage] = useState<'overview' | 'faq' | 'tickets' | 'ticket'>('overview')
@@ -28,8 +36,17 @@ const HelpCenter = () => {
       isActive: false,
     },
   ]
-  const [createTicket, setCreateTicket] = useState<boolean>(false)
+  const [createTicket, setCreateTicket] = useState<'new' | 'close' | TFaq>(null)
+  const [createCatTicket, setCreateTicketCategory] = useState<'new' | 'close' | TFaq>(null)
 
+  // const handleUpdate = (type: 'ticket' | 'faq', state: 'new' | 'close' | TFaq | TTicket) => {
+  //   if (type === 'ticket') {
+  //     setCreateTicket(state)
+  //   }
+  //   if (type === 'faq') {
+  //     setCreateTicket(state)
+  //   }
+  // }
   return (
     <>
       <PageTitle breadcrumbs={faqBreadcrumbs}>Help Center</PageTitle>
@@ -70,7 +87,7 @@ const HelpCenter = () => {
                   FAQ
                 </button>
               </li>
-              <li className='nav-item my-1'>
+              {/* <li className='nav-item my-1'>
                 <button
                   type='button'
                   onClick={() => setPage('ticket')}
@@ -80,15 +97,28 @@ const HelpCenter = () => {
                 >
                   Ticket
                 </button>
-              </li>
+              </li> */}
             </ul>
             <div className='d-flex gap-3'>
-              <button
-                className='btn btn-primary fw-bold fs-8 fs-lg-base'
-                onClick={() => setCreateTicket(true)}
-              >
-                Create Ticket
-              </button>
+              {page === 'tickets' && (
+                <>
+                  <button
+                    className='btn btn-primary fw-bold fs-8 fs-lg-base'
+                    onClick={() => setCreateTicket('new')}
+                  >
+                    Create Ticket
+                  </button>
+
+                  {currentUser?.roles.some((role) => role.name === 'Superadmin') && (
+                    <button
+                      className='btn btn-primary fw-bold fs-8 fs-lg-base'
+                      onClick={() => setCreateTicketCategory('new')}
+                    >
+                      Create Category
+                    </button>
+                  )}
+                </>
+              )}
               {currentUser?.roles.some((role) => role.name === 'Superadmin') && page === 'faq' && (
                 <button
                   type='button'
@@ -111,9 +141,15 @@ const HelpCenter = () => {
       </div>
       {page === 'overview' && <HelpCenterOverview setPage={setPage} />}
       {page === 'faq' && <HelpCenterFAQ FAQ={FAQ} setFAQ={setFAQ} />}
-      {page === 'tickets' && <HelpCenterTickets />}
-      {page === 'ticket' && <Ticket />}
-      {createTicket && <CreateTicket setCreateTicket={setCreateTicket} />}
+      {page === 'tickets' && <HelpCenterTickets handleViewTicket={handleViewTicket} />}
+      {page === 'ticket' && <Ticket ticket={TICKET} />}
+      {createTicket && <CreateTicket ticket={createTicket} setCreateTicket={setCreateTicket} />}
+      {createCatTicket && (
+        <CreateTicketCategory
+          ticketCategory={createCatTicket}
+          setCreateTicketCategory={setCreateTicketCategory}
+        />
+      )}
     </>
   )
 }

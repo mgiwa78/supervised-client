@@ -318,10 +318,10 @@ const ProposalApproval = ({proposal}: PropTypes) => {
                         </>
                       ))}
                     </select>
-                    {formik.touched.workflow && formik.errors.workflow && (
+                    {formik.touched.timeline && formik.errors.timeline && (
                       <div className='fv-plugins-message-container'>
                         <div className='fv-help-block'>
-                          <span role='alert'>{formik.errors.workflow}</span>
+                          <span role='alert'>{formik.errors.timeline}</span>
                         </div>
                       </div>
                     )}

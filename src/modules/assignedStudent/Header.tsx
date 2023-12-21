@@ -120,7 +120,7 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
                 </div>
               </div>
               {project?.workflow?.states.map((state) => (
-                <div className='col-3'>
+                <div key={state._id} className='col-3'>
                   <div className={`d-flex flex-stack fs-4 py-3 px-2 bg-light-${state.color}`}>
                     <div
                       className='fw-bold rotate cursor-pointer'
@@ -154,38 +154,29 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
                               } else return file?.status === state?._id
                             })
                             .map((file) => (
-                              <li
+                              <button
                                 key={file._id}
-                                className='d-flex justify-content-between align-items-left  '
+                                style={{
+                                  textAlign: 'left',
+                                  cursor: 'pointer',
+                                  backgroundColor: 'transparent',
+                                  border: 'none',
+                                }}
+                                onClick={() => {
+                                  setViewDoc(file)
+                                }}
+                                className='fs-6 text-gray-700 text-hover-primary fw-bold mb-1 left'
                               >
-                                <button
-                                  style={{
-                                    textAlign: 'left',
-                                    cursor: 'pointer',
-                                    backgroundColor: 'transparent',
-                                    border: 'none',
-                                  }}
-                                  onClick={() => {
-                                    setViewDoc(file)
-                                  }}
-                                  className='fs-6 text-gray-700 text-hover-primary fw-bold mb-1 left'
-                                >
-                                  <span className='bullet me-5'></span> {file.name}
-                                </button>
-                              </li>
+                                <span className='bullet me-5'></span> {file.name}
+                              </button>
                             ))
                         ) : (
-                          <li
-                            className='d-flex align-items-center py-2 '
-                            style={{marginLeft: '20px'}}
+                          <span
+                            style={{cursor: 'pointer'}}
+                            className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
                           >
-                            <span
-                              style={{cursor: 'pointer'}}
-                              className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
-                            >
-                              No Documents
-                            </span>
-                          </li>
+                            No Documents
+                          </span>
                         )}
                       </span>
                     </li>

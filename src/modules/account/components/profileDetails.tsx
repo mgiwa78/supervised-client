@@ -59,6 +59,30 @@ const ProfileDetails = ({profile}: PropTypes) => {
           </div>
         </div>
         <div className='row mb-7'>
+          <label className='col-lg-4 fw-semibold text-muted'>
+            Email Notification
+            <span
+              className='ms-1'
+              data-bs-toggle='tooltip'
+              aria-label='Phone number must be active'
+              data-bs-original-title='Phone number must be active'
+              data-kt-initialized='1'
+            >
+              <i className='ki-duotone ki-information fs-7'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+                <span className='path3'></span>
+              </i>
+            </span>
+          </label>
+          <div className='col-lg-8 d-flex align-items-center'>
+            <span className={`badge badge-${profile?.notification.email ? 'success' : 'warning'}`}>
+              {profile?.notification.email ? 'Enabled' : 'Disabled'}
+            </span>
+          </div>
+        </div>
+
+        <div className='row mb-7'>
           <label className='col-lg-4 fw-semibold text-muted'>Role</label>
           <div className='col-lg-8'>
             <a href='#' className='fw-semibold fs-6 text-gray-800 text-hover-primary'>
