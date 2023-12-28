@@ -11,6 +11,7 @@ import ProjectOverview from './projectOverview'
 import ProjectDocuments from './projectDocuments'
 import {Spinner} from '../../components/Spinner'
 import {PageLink, PageTitle} from '../../_metronic/layout/core'
+import EditProject from './editProject'
 
 const ProjectPage = () => {
   const token = useSelector(selectToken)
@@ -19,7 +20,7 @@ const ProjectPage = () => {
 
   const [project, setProject] = useState<TProject>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [page, setPage] = useState<'documents' | 'overview'>('overview')
+  const [page, setPage] = useState<'documents' | 'overview' | 'edit'>('overview')
   const getProject = async () => {
     setIsLoading(true)
     const RESPONSE = await get(`projects/${projectId}`, token)
@@ -67,6 +68,7 @@ const ProjectPage = () => {
           {page === 'documents' && (
             <ProjectDocuments refreshProject={refreshProject} project={project} />
           )}
+          {page === 'edit' && <EditProject refreshProject={refreshProject} project={project} />}
         </>
       )}
 

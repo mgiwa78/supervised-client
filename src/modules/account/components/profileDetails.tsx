@@ -1,5 +1,10 @@
 import React from 'react'
 import User from '../../../types/User'
+import {KTIcon} from '../../../_metronic/helpers'
+
+import {PDFDownloadLink} from '@react-pdf/renderer'
+import UserProfile from '../../../pdf-export/user-profile'
+
 type PropTypes = {
   profile: User
 }
@@ -10,12 +15,24 @@ const ProfileDetails = ({profile}: PropTypes) => {
         <div className='card-title m-0'>
           <h3 className='fw-bold m-0'>Profile Details</h3>
         </div>
-        <a
-          // href='../../demo1/dist/account/settings.html'
-          className='btn btn-sm btn-primary align-self-center'
-        >
-          Edit Profile
-        </a>
+
+        <div className='card-toolbar d-flex gap-2'>
+          <a href='edit' className='btn btn-sm btn-primary align-self-center '>
+            Edit Profile
+          </a>
+          <PDFDownloadLink document={<UserProfile user={profile} />} fileName='user-profile.pdf'>
+            {({blob, url, loading, error}) =>
+              loading ? (
+                'Loading document...'
+              ) : (
+                <button className='btn btn-sm btn-light-primary'>
+                  <KTIcon iconName='file-down' className='fs-2' />
+                  Export
+                </button>
+              )
+            }
+          </PDFDownloadLink>
+        </div>
       </div>
       <div className='card-body p-9'>
         <div className='row mb-7'>

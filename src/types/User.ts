@@ -11,6 +11,7 @@ type User = {
   contactNumber: string
   password?: string
   lastName: string
+  supervisor?: User
   roles?: Array<Role>
   rolesState?: any
   notification: {

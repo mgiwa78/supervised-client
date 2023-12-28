@@ -27,7 +27,6 @@ const initialValues = {
   contactNumber: '',
   lastName: '',
   password: '',
-  supervisor: '',
   updatedAt: '',
   _id: '',
   notification: {

@@ -6,6 +6,7 @@ import {useSelector} from 'react-redux'
 import {selectAuth} from '../../redux/selectors/auth'
 import Role from '../../types/Role'
 import get from '../../lib/get'
+import Notifications from './components/notifications'
 
 type RolesData = {
   role: Role
@@ -33,14 +34,16 @@ const Dashboard: FC = () => {
   return (
     <>
       <div className='row g-5 g-xl-8'>
-        {/* begin::Col */}
         <div className='col-xl-4'>
           <UserAnalytics
-            className='card-xl-stretch mb-xl-8'
+            className=' mb-xl-8'
             chartColor='primary'
             chartHeight='150px'
             data={roles}
           />
+        </div>
+        <div className='col-xl-6'>
+          <Notifications />
         </div>
       </div>
     </>

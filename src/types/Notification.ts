@@ -3,6 +3,7 @@ import User from './User'
 type TNotification = {
   title: string
   message: string
+  status: boolean
   color: string
   createdAt: string
   linkType: string

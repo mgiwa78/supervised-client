@@ -22,6 +22,7 @@ const Ticket = ({ticket}: Props) => {
   useEffect(() => {
     getTicket()
   }, [token])
+  
   return (
     <div className='card'>
       <div className='card-body'>

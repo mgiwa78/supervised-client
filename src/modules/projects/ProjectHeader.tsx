@@ -116,6 +116,14 @@ const ProjectHeader = ({setPage, page, project}: any) => {
               >
                 Documents
               </button>
+              <button
+                className={
+                  `nav-link text-active-primary me-6 py-5 ` + (page === `documents` && 'active')
+                }
+                onClick={() => setPage('edit')}
+              >
+                Edit
+              </button>
             </li>
           </ul>
         </div>
