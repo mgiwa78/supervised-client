@@ -8,6 +8,7 @@ type User = {
   firstName: string
   department: Department
   createdAt: string
+  studentId?: string
   contactNumber: string
   password?: string
   lastName: string
@@ -18,6 +19,7 @@ type User = {
     email: boolean
   }
 }
+
 export type UserEdit = {
   _id?: string
   email?: string
@@ -27,9 +29,11 @@ export type UserEdit = {
   firstName?: string
   department?: string
   createdAt?: string
+  studentId?: string
   password?: string
   lastName?: string
   roles?: Array<Role>
+
   rolesState?: any
   notification: {
     email: boolean

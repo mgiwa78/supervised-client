@@ -12,7 +12,7 @@ import get from '../../../lib/get'
 import Role from '../../../types/Role'
 import {create} from 'domain'
 import Department from '../../../types/Department'
-import {selectAuth} from '../../../redux/selectors/auth'
+import {selectAuth, selectToken} from '../../../redux/selectors/auth'
 // import {createUser, updateUser} from '../core/_requests'
 // import {useQueryResponse} from '../core/QueryResponseProvider'
 
@@ -28,6 +28,7 @@ interface UserForEdit {
 
 // Define rolesState as an object with string keys and boolean values
 const rolesState: {[key: string]: boolean} = {}
+
 const editUserSchema = Yup.object().shape({
   email: Yup.string()
     .email('Wrong email format')
@@ -55,12 +56,13 @@ const UserEditModalForm: FC<Props> = ({state}) => {
     setItemIdForUpdate,
     updateUser,
     createUser,
+    getUsers,
     allRoles,
     user: us,
     isLoading: isUserLoading,
   } = state
 
-  const token = useSelector((state: RootState) => state.auth.token)
+  const token = useSelector(selectToken)
 
   const [departments, setDepartments] = useState<Array<Department>>([])
   const [roles, setRoles] = useState<Array<any>>([])
@@ -137,6 +139,7 @@ const UserEditModalForm: FC<Props> = ({state}) => {
           console.log(2)
           createUser({...values, rolesState: userForEdit.rolesState}, token)
         }
+        console.log()
         setSubmitting(false)
       } catch (ex) {
         console.error(ex)
@@ -163,24 +166,25 @@ const UserEditModalForm: FC<Props> = ({state}) => {
           {/* begin::Input group */}
           <div className='fv-row mb-7'>
             {/* begin::Label */}
-            <label className='d-block fw-bold fs-6 mb-5'>Avatar</label>
-            {/* end::Label */}
+            <div className='col-6'>
+              <label className='d-block fw-bold fs-6 mb-5'>Avatar</label>
+              {/* end::Label */}
 
-            {/* begin::Image input */}
-            <div
-              className='image-input image-input-outline'
-              data-kt-image-input='true'
-              style={{backgroundImage: `url('${blankImg}')`}}
-            >
-              {/* begin::Preview existing avatar */}
+              {/* begin::Image input */}
               <div
-                className='image-input-wrapper w-125px h-125px'
+                className='image-input image-input-outline'
+                data-kt-image-input='true'
                 style={{backgroundImage: `url('${blankImg}')`}}
-              ></div>
-              {/* end::Preview existing avatar */}
+              >
+                {/* begin::Preview existing avatar */}
+                <div
+                  className='image-input-wrapper w-125px h-125px'
+                  style={{backgroundImage: `url('${userForEdit?.avatar}')`}}
+                ></div>
+                {/* end::Preview existing avatar */}
 
-              {/* begin::Label */}
-              {/* <label
+                {/* begin::Label */}
+                {/* <label
               className='btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow'
               data-kt-image-input-action='change'
               data-bs-toggle='tooltip'
@@ -191,10 +195,10 @@ const UserEditModalForm: FC<Props> = ({state}) => {
               <input type='file' name='avatar' accept='.png, .jpg, .jpeg' />
               <input type='hidden' name='avatar_remove' />
             </label> */}
-              {/* end::Label */}
+                {/* end::Label */}
 
-              {/* begin::Cancel */}
-              {/* <span
+                {/* begin::Cancel */}
+                {/* <span
               className='btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow'
               data-kt-image-input-action='cancel'
               data-bs-toggle='tooltip'
@@ -202,10 +206,10 @@ const UserEditModalForm: FC<Props> = ({state}) => {
             >
               <i className='bi bi-x fs-2'></i>
             </span> */}
-              {/* end::Cancel */}
+                {/* end::Cancel */}
 
-              {/* begin::Remove */}
-              {/* <span
+                {/* begin::Remove */}
+                {/* <span
               className='btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow'
               data-kt-image-input-action='remove'
               data-bs-toggle='tooltip'
@@ -213,8 +217,39 @@ const UserEditModalForm: FC<Props> = ({state}) => {
             >
               <i className='bi bi-x fs-2'></i>
             </span> */}
-              {/* end::Remove */}
+                {/* end::Remove */}
+              </div>
             </div>
+            {userForEdit?.roles?.some((role: Role) => role.name === 'Student') ||
+              (userForEdit?.roles?.some((role: Role) => role.name === 'Student') && (
+                <div className='col-6'>
+                  <label className='required fw-bold fs-6 mb-2'>Student Id</label>
+
+                  <input
+                    readOnly={true}
+                    placeholder='StudentId'
+                    {...formik.getFieldProps('studentId')}
+                    type='text'
+                    className={clsx(
+                      'form-control form-control-solid mb-3 mb-lg-0',
+                      {'is-invalid': formik.touched.studentId && formik.errors.studentId},
+                      {
+                        'is-valid': formik.touched.studentId && !formik.errors.studentId,
+                      }
+                    )}
+                    autoComplete='off'
+                    disabled={formik.isSubmitting || isUserLoading}
+                  />
+                  {formik.touched.firstName && formik.errors.firstName && (
+                    <div className='fv-plugins-message-container'>
+                      <div className='fv-help-block'>
+                        <span role='alert'>{formik.errors.firstName}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+
             {/* end::Image input */}
 
             {/* begin::Hint */}

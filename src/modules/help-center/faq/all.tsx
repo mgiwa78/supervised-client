@@ -149,13 +149,13 @@ const HelpCenterFAQ = ({setFAQ, FAQ}: Props) => {
           faqCategories?.map((cat) => {
             const c = cat
             return (
-              <div className='col-6 '>
+              <div className='col-6 ' key={cat._id}>
                 <div key={c?._id} className='card mb-15 h-100 card-stretch flex-grow'>
                   <div className='m-0 card-body'>
                     <h3 className='text-gray-800 w-bolder mb-4'>{c?.title}</h3>
                     {groupedFaq[c?._id] ? (
                       groupedFaq[c?._id]?.map((faq: TFaq) => (
-                        <>
+                        <div key={faq._id}>
                           <div
                             style={{position: 'relative'}}
                             key={faq._id + 'question'}
@@ -227,7 +227,7 @@ const HelpCenterFAQ = ({setFAQ, FAQ}: Props) => {
                             </div>
                             <div className='separator separator-dashed'></div>
                           </div>
-                        </>
+                        </div>
                       ))
                     ) : (
                       <h4 className=' text-muted cursor-pointer mb-0 '>No Faq</h4>

@@ -4,6 +4,7 @@ import {KTIcon} from '../../../_metronic/helpers'
 
 import {PDFDownloadLink} from '@react-pdf/renderer'
 import UserProfile from '../../../pdf-export/user-profile'
+import {Link} from 'react-router-dom'
 
 type PropTypes = {
   profile: User
@@ -17,9 +18,9 @@ const ProfileDetails = ({profile}: PropTypes) => {
         </div>
 
         <div className='card-toolbar d-flex gap-2'>
-          <a href='edit' className='btn btn-sm btn-primary align-self-center '>
+          <Link to='/account/edit' className='btn btn-sm btn-primary align-self-center '>
             Edit Profile
-          </a>
+          </Link>
           <PDFDownloadLink document={<UserProfile user={profile} />} fileName='user-profile.pdf'>
             {({blob, url, loading, error}) =>
               loading ? (

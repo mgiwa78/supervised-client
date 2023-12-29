@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import CreateTicket from './createTicket'
 import {useSelector} from 'react-redux'
-import {selectToken} from '../../../redux/selectors/auth'
+import {selectToken, selectUser} from '../../../redux/selectors/auth'
 import TTicket from '../../../types/ticket'
 import get from '../../../lib/get'
 
@@ -10,10 +10,14 @@ type Prop = {
 }
 const HelpCenterTickets = ({handleViewTicket}: Prop) => {
   const token = useSelector(selectToken)
+  const currentUser = useSelector(selectUser)
   const [tickets, setTickets] = useState<Array<TTicket>>()
 
+  const isAdmin = currentUser?.roles.some((role) => role.name === 'Superadmin')
+
   const getTicket = async () => {
-    const RESPONSE = await get('tickets', token)
+    let RESPONSE
+    isAdmin ? (RESPONSE = await get('tickets', token)) : (RESPONSE = await get('tickets/my', token))
 
     if (RESPONSE?.data) {
       setTickets(RESPONSE.data)
@@ -23,6 +27,7 @@ const HelpCenterTickets = ({handleViewTicket}: Prop) => {
   useEffect(() => {
     getTicket()
   }, [token])
+
   return (
     <>
       <div className='card'>
@@ -40,16 +45,16 @@ const HelpCenterTickets = ({handleViewTicket}: Prop) => {
                       type='text'
                       className='form-control form-control-lg form-control-solid ps-14'
                       name='search'
-                      value=''
                       placeholder='Search'
                     />
                   </div>
                 </form>
-                <h1 className='text-dark mb-10'>Public Tickets</h1>
+                <h1 className='text-dark mb-10'>{isAdmin ? 'Tickets' : 'My Tickets'}</h1>
                 <div className='mb-10'>
-                  {tickets?.length > 1 ? (
+                  {tickets?.length > 0 ? (
                     tickets?.map((ticket) => (
                       <div
+                        key={ticket._id}
                         style={{cursor: 'pointer'}}
                         className='d-flex mb-10'
                         onClick={() => handleViewTicket(ticket)}
@@ -74,7 +79,7 @@ const HelpCenterTickets = ({handleViewTicket}: Prop) => {
                     ))
                   ) : (
                     <div className='d-flex mb-10'>
-                      <span className='text-muted fw-semibold fs-6'>No Tickets</span>
+                      <span className='text-muted fw-semibold fs-6'>You have no tickets</span>
                     </div>
                   )}
                 </div>

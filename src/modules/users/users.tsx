@@ -61,7 +61,7 @@ const Users = ({role = 'Users'}) => {
       )
     )
   }, [users, searchTerm])
-
+  console.log(currentUser?.roles)
   const paginatedData = useMemo(() => {
     const startIndex = currentPage * pageSize
     return filteredData?.slice(startIndex, startIndex + pageSize)
@@ -104,40 +104,39 @@ const Users = ({role = 'Users'}) => {
                 placeholder='Search'
               />
             </div>
-            <button
-              type='button'
-              className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
-              data-kt-menu-trigger='click'
-              data-kt-menu-placement='bottom-end'
-              data-kt-menu-flip='top-end'
-            >
-              <KTIcon iconName='category' className='fs-2' />
-            </button>
-            <div
-              className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
-              data-kt-menu='true'
-            >
-              <div className='menu-item px-3'>
-                <div className='menu-content fs-6 text-dark fw-bold px-3 py-4'>Quick Actions</div>
-              </div>
-              <div className='separator mb-3 opacity-75'></div>
 
-              <div className='menu-item px-3'>
-                <a onClick={() => handleModalUpdate(null)} className='menu-link px-3'>
-                  New {role}
-                </a>
-              </div>
+            {currentUser?.roles.some((role) => role.name === 'Superadmin') && (
+              <>
+                <button
+                  type='button'
+                  className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
+                  data-kt-menu-trigger='click'
+                  data-kt-menu-placement='bottom-end'
+                  data-kt-menu-flip='top-end'
+                >
+                  <KTIcon iconName='category' className='fs-2' />
+                </button>{' '}
+                <div
+                  className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
+                  data-kt-menu='true'
+                >
+                  <div className='menu-item px-3'>
+                    <div className='menu-content fs-6 text-dark fw-bold px-3 py-4'>
+                      Quick Actions
+                    </div>
+                  </div>
+                  <div className='separator mb-3 opacity-75'></div>
 
-              <div className='separator mt-3 opacity-75'></div>
+                  <div className='menu-item px-3'>
+                    <a onClick={() => handleModalUpdate(null)} className='menu-link px-3'>
+                      New {role}
+                    </a>
+                  </div>
 
-              {/* <div className='menu-item px-3'>
-                <div className='menu-content px-3 py-3'>
-                  <a className='btn btn-primary btn-sm px-4' href='#'>
-                    Generate Reports
-                  </a>
-                </div>
-              </div> */}
-            </div>
+                  <div className='separator mt-3 opacity-75'></div>
+                </div>{' '}
+              </>
+            )}
           </div>
         </div>
         <div className='card-body py-3'>
@@ -145,22 +144,12 @@ const Users = ({role = 'Users'}) => {
             <table className='table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3'>
               <thead>
                 <tr className='fw-bold text-muted'>
-                  <th className='w-25px'>
-                    <div className='form-check form-check-sm form-check-custom form-check-solid'>
-                      <input
-                        className='form-check-input'
-                        type='checkbox'
-                        value='1'
-                        data-kt-check='true'
-                        data-kt-check-target='.widget-13-check'
-                      />
-                    </div>
-                  </th>
-                  <th className='min-w-150px'>User Id</th>
+                  {currentUser?.roles.some((role) => role.name === 'Superadmin') && (
+                    <th className='min-w-140px'>User Id</th>
+                  )}
                   <th className='min-w-140px'>Name</th>
+                  {role == 'students' && <th className='min-w-150px'>Student Id</th>}
                   <th className='min-w-120px'>Department</th>
-                  {/* <th className='min-w-120px'>Roles</th> */}
-                  <th className='min-w-120px'>Created At</th>
                   <th className='min-w-120px'>Role</th>
                   {currentUser?.roles.some((role) => role.name === 'Super Admin') && (
                     <th className='min-w-100px text-end'>Actions</th>
@@ -182,20 +171,13 @@ const Users = ({role = 'Users'}) => {
                   paginatedData.map((user: User) => {
                     return (
                       <tr key={user._id}>
-                        <td>
-                          <div className='form-check form-check-sm form-check-custom form-check-solid'>
-                            <input
-                              className='form-check-input widget-13-check'
-                              type='checkbox'
-                              value='1'
-                            />
-                          </div>
-                        </td>
-                        <td>
-                          <span className='text-dark fw-bold text-hover-primary fs-6'>
-                            {user._id}
-                          </span>
-                        </td>
+                        {currentUser?.roles.some((role) => role.name === 'Superadmin') && (
+                          <td>
+                            <span className='text-dark fw-bold text-hover-primary fs-6'>
+                              {user._id}
+                            </span>
+                          </td>
+                        )}
                         <td>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
                             {user.lastName} {user.firstName}
@@ -204,6 +186,14 @@ const Users = ({role = 'Users'}) => {
                             {user.email}
                           </span>
                         </td>
+                        {role == 'students' && (
+                          <td>
+                            <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
+                              {user.studentId}
+                            </span>
+                          </td>
+                        )}
+
                         <td>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
                             {user.department.name}
@@ -212,9 +202,7 @@ const Users = ({role = 'Users'}) => {
                         {/* <td>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'></span>
                         </td> */}
-                        <td className='text-dark fw-bold text-hover-primary fs-6'>
-                          {FormatDate(user.createdAt)}
-                        </td>
+
                         <td>
                           {user.roles.map((e) => (
                             <span key={e._id} className='badge badge-light-success'>
@@ -222,7 +210,7 @@ const Users = ({role = 'Users'}) => {
                             </span>
                           ))}
                         </td>
-                        {currentUser?.roles.some((role) => role.name === 'Super Admin') && (
+                        {currentUser?.roles.some((role) => role.name === 'Superadmin') && (
                           <td className='text-end'>
                             {/* <a
                               href='#'

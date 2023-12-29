@@ -117,10 +117,10 @@ Proposal
           ></SidebarMenuItem>
         </>
       )}
-      <SidebarMenuItemWithSub to='/account' title='Account' fontIcon='bi-user' icon='user'>
+      {/* <SidebarMenuItemWithSub to='/account' title='Account' fontIcon='bi-user' icon='user'>
         <SidebarMenuItem to='/account/overview' title='Overview' hasBullet={true} />
         <SidebarMenuItem to='/account/edit' title='Edit' hasBullet={true} />
-      </SidebarMenuItemWithSub>
+      </SidebarMenuItemWithSub> */}
       <SidebarMenuItem to='/help-center' title='Help center' fontIcon='bi-chart' icon='chart' />
     </>
   )

@@ -1,19 +1,81 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Link, useLocation} from 'react-router-dom'
 import {TProposal} from '../../types/Proposal'
 import FormatDate from '../../utils/FormatDate'
 import {KTIcon, toAbsoluteUrl} from '../../_metronic/helpers'
 import ViewProposalDoc from './viewProposalDocument'
+import * as swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import post from '../../lib/post'
+import {useSelector} from 'react-redux'
+import {selectToken} from '../../redux/selectors/auth'
+import get from '../../lib/get'
+import TWorkflow from '../../types/Workflow'
+
+const MySwal = withReactContent(swal.default)
 
 type PropType = {
   proposal: TProposal
+  workflows: Array<TWorkflow>
 }
 
-const ProposalOverview = ({proposal}: PropType) => {
+const ProposalOverview = ({proposal, workflows}: PropType) => {
   const [docView, setDocView] = useState<any>()
   const handleViewDocClose = () => {
     setDocView(undefined)
   }
+  const token = useSelector(selectToken)
+
+  const handleDelete = async (document: TProposal) => {
+    // ...{[workflow._id]:[workflow.title]}
+    console.log()
+    MySwal.fire({
+      title: 'Are you sure, you want to approve this proposal?',
+      text: `Document title: ${document.title}`,
+      icon: 'error',
+      input: 'select',
+      inputOptions: {
+        // ...workflows.map((workflow) => ({[workflow._id]: [workflow.title]})),
+        apples: 'Apples',
+        bananas: 'Bananas',
+        grapes: 'Grapes',
+        oranges: 'Oranges',
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'Yes Delete!',
+      showCancelButton: true,
+      heightAuto: false,
+      customClass: {
+        confirmButton: 'btn btn-danger',
+        cancelButton: 'btn btn-secondary',
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await post('proposals/approve', {...proposal}, token, true, 'Project Approved').then(
+          (res) => {
+            if (res?.data) {
+              MySwal.fire({
+                title: 'Deleted!',
+                text: 'File has been deleted.',
+                icon: 'success',
+              })
+            } else {
+              MySwal.fire({
+                title: 'Error',
+                text: res?.error,
+                icon: 'error',
+                confirmButtonText: 'Close!',
+                customClass: {
+                  confirmButton: 'btn btn-danger',
+                },
+              })
+            }
+          }
+        )
+      }
+    })
+  }
+
   return (
     <>
       {proposal ? (
@@ -24,6 +86,48 @@ const ProposalOverview = ({proposal}: PropType) => {
                 <div className='card-title flex-column'>
                   <h3 className='fw-bold '> Overview</h3>
                 </div>
+                {/* <div className='card-toolbar'>
+                  <button
+                    type='button'
+                    className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
+                    data-kt-menu-trigger='click'
+                    data-kt-menu-placement='bottom-end'
+                    data-kt-menu-flip='top-end'
+                  >
+                    <KTIcon iconName='category' className='fs-2' />
+                  </button>
+                  <div
+                    className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
+                    data-kt-menu='true'
+                  >
+                    <div className='menu-item px-3'>
+                      <a
+                        onClick={() => null}
+                        className='menu-link bg-hover-success text-hover-white  px-3'
+                      >
+                        Approve
+                      </a>
+                    </div>
+                    <div className='menu-item px-3'>
+                      <a
+                        onClick={() => null}
+                        className='menu-link bg-hover-danger text-hover-white px-3'
+                      >
+                        Reject
+                      </a>
+                    </div>
+
+                    <div className='separator mt-3 opacity-75'></div>
+
+                    {/* <div className='menu-item px-3'>
+                <div className='menu-content px-3 py-3'>
+                  <a className='btn btn-primary btn-sm px-4' href='#'>
+                    Generate Reports
+                  </a>
+                </div>
+              </div> 
+                  </div>
+                </div> */}
               </div>
               <div className='card-body'>
                 <div className='d-flex gap-7 align-items-center mb-8'>
@@ -57,6 +161,10 @@ const ProposalOverview = ({proposal}: PropType) => {
                   <div className='d-flex flex-column gap-1'>
                     <div className='fw-bold text-muted'>Timeline</div>
                     <div className='fw-bold fs-5'>{proposal?.timeline}</div>
+                  </div>
+                  <div className='d-flex flex-column gap-1'>
+                    <div className='fw-bold text-muted'>Methodology</div>
+                    <div className='fw-bold fs-5'>{proposal?.methodology}</div>
                   </div>
                   <div className='d-flex flex-column gap-1'>
                     <div className='fw-bold text-muted'>Date Submitted</div>

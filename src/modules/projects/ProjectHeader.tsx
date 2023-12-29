@@ -11,7 +11,13 @@ import {Spinner} from '../../components/Spinner'
 import {TProject} from '../../types/Project'
 import FormatDate from '../../utils/FormatDate'
 
-const ProjectHeader = ({setPage, page, project}: any) => {
+type Props = {
+  setPage: Function
+  page: string
+  project: TProject
+}
+
+const ProjectHeader = ({setPage, page, project}: Props) => {
   const token = useSelector(selectToken)
   const location = useLocation()
   const {projectId} = useParams()
@@ -39,7 +45,12 @@ const ProjectHeader = ({setPage, page, project}: any) => {
                     <a href='#' className='text-gray-800 text-hover-primary fs-2 fw-bold me-3'>
                       {project.title}
                     </a>
-                    <span className='badge badge-light-success me-auto'>{project.status}</span>
+                    <span
+                      style={{backgroundColor: project?.status?.color}}
+                      className={`badge  me-auto`}
+                    >
+                      {project.status.title}
+                    </span>
                   </div>
                   <div className='d-flex flex-wrap fw-semibold mb-4 fs-5 text-gray-400'>
                     {project.description}
@@ -102,14 +113,6 @@ const ProjectHeader = ({setPage, page, project}: any) => {
             <li className='nav-item'>
               <button
                 className={
-                  `nav-link text-active-primary me-6 py-5 ` + (page === `overview` && 'active')
-                }
-                onClick={() => setPage('overview')}
-              >
-                Overview
-              </button>
-              <button
-                className={
                   `nav-link text-active-primary me-6 py-5 ` + (page === `documents` && 'active')
                 }
                 onClick={() => setPage('documents')}
@@ -118,7 +121,7 @@ const ProjectHeader = ({setPage, page, project}: any) => {
               </button>
               <button
                 className={
-                  `nav-link text-active-primary me-6 py-5 ` + (page === `documents` && 'active')
+                  `nav-link text-active-primary me-6 py-5 ` + (page === `edit` && 'active')
                 }
                 onClick={() => setPage('edit')}
               >

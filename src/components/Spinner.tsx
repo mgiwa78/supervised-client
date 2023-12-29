@@ -20,7 +20,7 @@ const Spinner = () => {
         alignItems: 'center',
       }}
     >
-      <div style={{...styles, textAlign: 'center'}}> Loading...</div>
+      <div style={{...styles, textAlign: 'center'}}> "Loading..."</div>
     </div>
   )
 }

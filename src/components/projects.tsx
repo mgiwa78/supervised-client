@@ -8,6 +8,8 @@ import get from '../lib/get'
 import {Spinner} from '../components/Spinner'
 import {PageLink, PageTitle} from '../_metronic/layout/core'
 import FormatDate from '../utils/FormatDate'
+import {PDFDownloadLink} from '@react-pdf/renderer'
+import ProjectPDF from '../pdf-export/project-details'
 type Props = {
   projects: Array<TProject>
   setProjects: Function
@@ -57,93 +59,204 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
   }
   return (
     <div style={{minHeight: '100%', position: 'relative'}}>
-      <div className='d-flex flex-wrap flex-stack my-5' data-select2-id='select2-data-121-rgid'>
-        <h2>Projects</h2>
-        <div className='d-flex flex-wrap my-1'>
-          <div className='d-flex align-items-center position-relative me-4'>
-            <i className='ki-duotone ki-magnifier fs-3 position-absolute ms-3'>
-              <span className='path1'></span>
-              <span className='path2'></span>
-            </i>
-            <input
-              onChange={(e) => setSearchTerm(e.target.value)}
-              type='text'
-              id='kt_filter_search'
-              className='form-control form-control-sm form-control-solid w-150px ps-10'
-              placeholder='Search'
-            />
+      <div className={`card mb-5 mb-xl-8`} style={{minHeight: '100%', position: 'relative'}}>
+        <div className='card-header border-0 pt-5'>
+          <h3 className='card-title align-items-start flex-column'>
+            <span className='card-label fw-bold fs-3 mb-1'>Projects</span>
+            <span className='text-muted mt-1 fw-semibold fs-7'>
+              Total assigned projects {projects ? projects.length : ''}
+            </span>
+          </h3>
+
+          <div className='card-toolbar'>
+            <div className='d-flex align-items-center position-relative me-4'>
+              <i className='ki-duotone ki-magnifier fs-3 position-absolute ms-3'>
+                <span className='path1'></span>
+                <span className='path2'></span>
+              </i>
+              <input
+                onChange={(e) => setSearchTerm(e.target.value)}
+                type='text'
+                id='kt_filter_search'
+                className='form-control form-control-sm form-control-solid w-150px ps-10'
+                placeholder='Search'
+              />
+            </div>
+            {currentUser?.roles.some((role) => role.name === 'Student') && (
+              <>
+                <button
+                  type='button'
+                  className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
+                  data-kt-menu-trigger='click'
+                  data-kt-menu-placement='bottom-end'
+                  data-kt-menu-flip='top-end'
+                >
+                  <KTIcon iconName='category' className='fs-2' />
+                </button>
+                <div
+                  className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
+                  data-kt-menu='true'
+                >
+                  <div className='menu-item px-3'>
+                    <div className='menu-content fs-6 text-dark fw-bold px-3 py-4'>
+                      Quick Actions
+                    </div>
+                  </div>
+                  <div className='separator mb-3 opacity-75'></div>
+
+                  <div className='menu-item px-3'>
+                    <a onClick={() => null} className='menu-link px-3'>
+                      New Proposal
+                    </a>
+                  </div>
+
+                  <div className='separator mt-3 opacity-75'></div>
+
+                  {/* <div className='menu-item px-3'>
+                <div className='menu-content px-3 py-3'>
+                  <a className='btn btn-primary btn-sm px-4' href='#'>
+                    Generate Reports
+                  </a>
+                </div>
+              </div> */}
+                </div>{' '}
+              </>
+            )}
+          </div>
+        </div>
+        <div className='card-body py-3'>
+          <div className='table-responsive'>
+            <table className='table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3'>
+              <thead>
+                <tr className='fw-bold text-muted'>
+                  <th className='min-w-140px'>Title</th>
+                  <th className='min-w-120px'>Student</th>
+                  <th className='min-w-120px'>Status</th>
+                  <th className='min-w-120px'>Submited</th>
+                  <th className='min-w-120px text-center'>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoading && (
+                  <tr className='fw-bold text-muted'>
+                    <td colSpan={5}>
+                      <Spinner />
+                    </td>
+                  </tr>
+                )}
+                {projects ? (
+                  paginatedData.map((project: TProject) => {
+                    const student =
+                      typeof project.student === 'object' ? project.student._id : project.student
+
+                    return (
+                      <tr key={project._id}>
+                        <td>
+                          <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
+                            {project.title}
+                          </span>
+                          <span className='text-muted fw-semibold text-muted d-block fs-7'>
+                            {project.description}
+                          </span>
+                        </td>
+                        <td>
+                          <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
+                            {project?.student?.lastName + ' ' + project?.student?.firstName}
+                          </span>
+                          <span className=' fw-semibold text-muted d-block fs-7'>
+                            {project?.student?.department?.name}
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            style={{backgroundColor: `${project.status.color}`}}
+                            className='badge '
+                          >
+                            {project.status.title || 'Pending'}
+                          </span>
+                        </td>
+                        {/* <td>
+                          <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'></span>
+                        </td> */}
+                        <td className='text-dark fw-bold text-hover-primary fs-6'>
+                          {FormatDate(project.createdAt)}
+                        </td>
+
+                        <td className='text-center'>
+                          <PDFDownloadLink
+                            document={<ProjectPDF project={project} />}
+                            fileName={`${project.title}_details.pdf`}
+                          >
+                            {({blob, url, loading, error}) => {
+                              return loading ? (
+                                'Loading document...'
+                              ) : (
+                                <button className='btn btn-sm btn-primary mx-1'>
+                                  <KTIcon iconName='file-down' className='fs-2' />
+                                  Export
+                                </button>
+                              )
+                            }}
+                          </PDFDownloadLink>
+                          {currentUser?.roles.some((role) => role.name === 'Supervisor') && (
+                            <Link
+                              to={`/students/assignedStudents/${student}/project/${project._id}`}
+                              title='View'
+                              className='btn  btn-primary  btn-sm me-1 mr-1'
+                            >
+                              <KTIcon iconName='eye' className='fs-3' />
+                              View Project
+                            </Link>
+                          )}
+                          {currentUser?.roles.some((role) => role.name === 'Student') && (
+                            <Link
+                              to={`/project/${project._id}`}
+                              title='View'
+                              className='btn  btn-primary  btn-sm me-1 mr-1'
+                            >
+                              <KTIcon iconName='eye' className='fs-3' />
+                              View Project
+                            </Link>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={4}>
+                      <div className='fv-row d-flex justify-content-center mh-300px'>
+                        <div className='h-40px w-40px spinner-border spinner-border-sm align-middle ms-2'></div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {projects.length === 0 && !isLoading && (
+                  <tr>
+                    <td colSpan={7}>
+                      <div className='fv-row d-flex justify-content-center mh-300px'>
+                        <div className='fv-row d-flex justify-content-center mh-300px fs-5 py-20'>
+                          <span className='text-muted'> No projects</span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-      <div className='row g-6 g-xl-9'>
-        <>
-          {projects.length > 0 &&
-            projects.map((project) => {
-              if (!project) return ''
-              const student =
-                typeof project.student === 'object' ? project.student._id : project.student
-
-              return (
-                <div className='col-md-6 col-xl-4' key={project._id}>
-                  <Link
-                    to={
-                      currentUser?.roles.some((role) => role.name === 'Supervisor') &&
-                      `/students/assignedStudents/${student}/project/${project._id}`
-                    }
-                    className='card border-hover-primary'
-                  >
-                    <div className='card-header border-0 pt-9'>
-                      <div className='card-title m-0'>
-                        <div className='symbol symbol-50px w-50px bg-light'>
-                          <span className='symbol-label bg-secondary text-inverse-secondary fw-bold'>
-                            {project?.title[0]}
-                          </span>
-                        </div>
-                      </div>
-                      <div className='card-toolbar'>
-                        <span
-                          className={`badge  fw-bold me-auto px-4 py-3`}
-                          style={{backgroundColor: project?.status?.title}}
-                        >
-                          {project?.status?.title}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className='card-body p-9'>
-                      <div className='fs-3 fw-bold text-dark'>{project?.title}</div>
-                      <p className='text-gray-400 fw-semibold fs-5 mt-1 mb-7'>
-                        {project?.description}
-                      </p>
-                      <div className='d-flex flex-wrap mb-5'>
-                        <div className='border border-gray-300 border-dashed rounded min-w-120px py-3 px-4 me-7 mb-3'>
-                          <div className='fs-6 text-gray-800 fw-bold'>
-                            {project?.createdAt ? FormatDate(project?.createdAt) : '-----'}
-                          </div>
-                          <div className='fw-semibold text-gray-400'>Created Date</div>
-                        </div>
-                        <div className='border border-gray-300 border-dashed rounded min-w-120px py-3 px-4 mb-3'>
-                          <div className='fs-6 text-gray-800 fw-bold'>{project?.files.length}</div>
-                          <div className='fw-semibold text-gray-400'>Documents</div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              )
-            })}
-          {!projects && isLoading && (
-            <div className='fv-row d-flex justify-content-center mh-300px'>
-              <div className='h-40px w-40px spinner-border spinner-border-sm align-middle ms-2'></div>
-            </div>
-          )}
-          {projects.length === 0 && !isLoading && (
-            <div className='fv-row d-flex justify-content-center mh-300px fs-5 py-20'>
-              <span className='text-muted'> No Projects</span>
-            </div>
-          )}
-        </>
-      </div>{' '}
+      {!projects && isLoading && (
+        <div className='fv-row d-flex justify-content-center mh-300px'>
+          <div className='h-40px w-40px spinner-border spinner-border-sm align-middle ms-2'></div>
+        </div>
+      )}
+      {projects.length === 0 && !isLoading && (
+        <div className='fv-row d-flex justify-content-center mh-300px fs-5 py-20'>
+          <span className='text-muted'> No Projects</span>
+        </div>
+      )}
       <div className='d-flex' style={{position: 'absolute', bottom: '20px', right: '20px'}}>
         <select
           name='status'

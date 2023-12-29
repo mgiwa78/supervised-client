@@ -87,40 +87,6 @@ const AssignedStudents = ({role = 'Users'}) => {
                 placeholder='Search'
               />
             </div>
-            {/*<button
-              type='button'
-              className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
-              data-kt-menu-trigger='click'
-              data-kt-menu-placement='bottom-end'
-              data-kt-menu-flip='top-end'
-            >
-              <KTIcon iconName='category' className='fs-2' />
-            </button>
-           <div
-              className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
-              data-kt-menu='true'
-            >
-              <div className='menu-item px-3'>
-                <div className='menu-content fs-6 text-dark fw-bold px-3 py-4'>Quick Actions</div>
-              </div>
-              <div className='separator mb-3 opacity-75'></div>
-
-              <div className='menu-item px-3'>
-                <a onClick={() => handleModalUpdate(null)} className='menu-link px-3'>
-                  New {role}
-                </a>
-              </div>
-
-              <div className='separator mt-3 opacity-75'></div>
-
-               <div className='menu-item px-3'>
-                <div className='menu-content px-3 py-3'>
-                  <a className='btn btn-primary btn-sm px-4' href='#'>
-                    Generate Reports
-                  </a>
-                </div>
-              </div> 
-            </div>*/}
           </div>
         </div>
         <div className='card-body py-3'>
@@ -128,28 +94,16 @@ const AssignedStudents = ({role = 'Users'}) => {
             <table className='table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3'>
               <thead>
                 <tr className='fw-bold text-muted'>
-                  <th className='w-25px'>
-                    <div className='form-check form-check-sm form-check-custom form-check-solid'>
-                      <input
-                        className='form-check-input'
-                        type='checkbox'
-                        value='1'
-                        data-kt-check='true'
-                        data-kt-check-target='.widget-13-check'
-                      />
-                    </div>
-                  </th>
-                  <th className='min-w-150px'>User Id</th>
                   <th className='min-w-140px'>Name</th>
+                  <th className='min-w-150px'>Student Id</th>
                   <th className='min-w-120px'>Department</th>
                   {/* <th className='min-w-120px'>Roles</th> */}
-                  <th className='min-w-120px'>Created At</th>
                   <th className='min-w-120px'>Role</th>
                   <th className='min-w-100px text-end'>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {isLoading ? (
+                {isLoading && (
                   <tr>
                     <td colSpan={7}>
                       <div className='fv-row d-flex justify-content-center mh-300px'>
@@ -157,33 +111,22 @@ const AssignedStudents = ({role = 'Users'}) => {
                       </div>
                     </td>
                   </tr>
-                ) : (
-                  ''
                 )}
                 {students ? (
                   students.map((user: User) => {
                     return (
                       <tr key={user._id}>
                         <td>
-                          <div className='form-check form-check-sm form-check-custom form-check-solid'>
-                            <input
-                              className='form-check-input widget-13-check'
-                              type='checkbox'
-                              value='1'
-                            />
-                          </div>
-                        </td>
-                        <td>
-                          <span className='text-dark fw-bold text-hover-primary fs-6'>
-                            {user._id}
-                          </span>
-                        </td>
-                        <td>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
                             {user.lastName} {user.firstName}
                           </span>
                           <span className='text-muted fw-semibold text-muted d-block fs-7'>
                             {user.email}
+                          </span>
+                        </td>
+                        <td>
+                          <span className='text-dark fw-bold text-hover-primary fs-6'>
+                            {user?.studentId}
                           </span>
                         </td>
                         <td>
@@ -194,9 +137,6 @@ const AssignedStudents = ({role = 'Users'}) => {
                         {/* <td>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'></span>
                         </td> */}
-                        <td className='text-dark fw-bold text-hover-primary fs-6'>
-                          {FormatDate(user.createdAt)}
-                        </td>
                         <td>
                           {user.roles.map((e) => (
                             <span key={e._id} className='badge badge-light-success'>
@@ -214,9 +154,11 @@ const AssignedStudents = ({role = 'Users'}) => {
                           <Link
                             to={`${user._id}`}
                             // onClick={() => handleModalUpdate(user)}
-                            className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 mr-1'
+                            className='btn btn-primary  btn-sm me-1 mr-1'
                           >
-                            <KTIcon iconName='eye' className='fs-3' />
+                            <KTIcon iconName='some-files' className='fs-3 mx-1' />
+
+                            <span className='indicator-label'>View Projects </span>
                           </Link>
                           {/* <a
                               href='#'

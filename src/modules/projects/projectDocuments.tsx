@@ -14,7 +14,12 @@ import deleteReq from '../../lib/delete'
 
 const MySwal = withReactContent(swal.default)
 
-const ProjectDocuments = ({project, refreshProject}: any) => {
+type Props = {
+  refreshProject: Function
+  project: TProject
+}
+
+const ProjectDocuments = ({project, refreshProject}: Props) => {
   const location = useLocation()
   const user = useSelector(selectUser)
   const {projectId} = useParams()
@@ -125,15 +130,14 @@ const ProjectDocuments = ({project, refreshProject}: any) => {
               data-kt-initialized='1'
               defaultValue={'Backlog'}
             >
-              <option value='Active' data-select2-id='select2-data-11-t490'>
-                Approved
+              <option value='' data-select2-id='select2-data-11-t490'>
+                Select State
               </option>
-              <option value='Approved' data-select2-id='select2-data-200-ki3t'>
-                In Progress
-              </option>
-              <option value='Backlog' data-select2-id='select2-data-201-pnvr'>
-                Backlog
-              </option>
+              {project?.workflow?.states?.map((state) => (
+                <option value={state._id} key={state._id} data-select2-id='select2-data-11-t490'>
+                  {state.title}
+                </option>
+              ))}
             </select>
           </div>
           {user?.roles.some((role) => role.name === 'Student') && (

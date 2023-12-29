@@ -5,11 +5,12 @@ import {toAbsoluteUrl} from '../../_metronic/helpers'
 import User, {UserEdit} from '../../types/User'
 import get from '../../lib/get'
 import {useSelector} from 'react-redux'
-import {selectAuth} from '../../redux/selectors/auth'
+import {selectAuth, selectUser} from '../../redux/selectors/auth'
 import put from '../../lib/put'
 import {getDownloadURL, ref, uploadBytes} from 'firebase/storage'
 import {storage} from '../../utils/firebase'
 import {userInfo} from 'os'
+import {Link} from 'react-router-dom'
 
 const profileDetailsSchema = Yup.object().shape({
   firstName: Yup.string().required('First name is required'),
@@ -41,6 +42,9 @@ const EditAccount: React.FC = () => {
   const [newProfile, setNewProfile] = useState<File>()
   const [isSubmitting, setSubmitting] = useState<boolean>(true)
   const {token} = useSelector(selectAuth)
+  const currentUser = useSelector(selectUser)
+
+  const isAdmin = currentUser?.roles.some((role) => role.name === 'Superadmin')
 
   const updateData = (fieldsToUpdate: Partial<User>): void => {
     const updatedData = Object.assign(data, fieldsToUpdate)
@@ -124,16 +128,14 @@ const EditAccount: React.FC = () => {
 
   return (
     <div className='card mb-5 mb-xl-10'>
-      <div
-        className='card-header border-0 cursor-pointer'
-        role='button'
-        data-bs-toggle='collapse'
-        data-bs-target='#kt_account_profile_details'
-        aria-expanded='true'
-        aria-controls='kt_account_profile_details'
-      >
+      <div className='card-header border-0 cursor-pointer'>
         <div className='card-title m-0'>
           <h3 className='fw-bolder m-0'>Profile Details</h3>
+        </div>
+        <div className='card-toolbar d-flex gap-2'>
+          <Link to='/account/overview' className='btn btn-sm btn-primary align-self-center '>
+            Edit Profile
+          </Link>
         </div>
       </div>
 
@@ -195,6 +197,7 @@ const EditAccount: React.FC = () => {
                       type='text'
                       className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
                       placeholder='First name'
+                      readOnly={!isAdmin}
                       {...formik.getFieldProps('firstName')}
                     />
                     {formik.touched.firstName && formik.errors.firstName && (
@@ -209,6 +212,7 @@ const EditAccount: React.FC = () => {
                       type='text'
                       className='form-control form-control-lg form-control-solid'
                       placeholder='Last name'
+                      readOnly={!isAdmin}
                       {...formik.getFieldProps('lastName')}
                     />
                     {formik.touched.lastName && formik.errors.lastName && (
@@ -229,6 +233,7 @@ const EditAccount: React.FC = () => {
                   type='text'
                   className='form-control form-control-lg form-control-solid'
                   placeholder='Email'
+                  readOnly={!isAdmin}
                   {...formik.getFieldProps('email')}
                 />
                 {formik.touched.email && formik.errors.email && (

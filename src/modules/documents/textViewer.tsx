@@ -76,7 +76,6 @@ const FileViewer = ({file}: PropeType) => {
     <div>
       {file ? (
         <div className='control-section'>
-          {/* Render the PDF Viewer */}
           <PdfViewerComponent
             id='container'
             documentPath={file?.path}

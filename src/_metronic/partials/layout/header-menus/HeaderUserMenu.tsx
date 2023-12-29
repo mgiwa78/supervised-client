@@ -137,15 +137,11 @@ const HeaderUserMenu: FC = () => {
         </a>
       </div> */}
 
-      {/* <div className='separator my-2'></div>
-
-      <Languages />
-
       <div className='menu-item px-5 my-1'>
-        <Link to='/crafted/account/settings' className='menu-link px-5'>
-          Account Settings
+        <Link to='/account/overview' className='menu-link px-5'>
+          Account
         </Link>
-      </div> */}
+      </div>
 
       <div className='menu-item px-5'>
         <a onClick={handleLogout} className='menu-link px-5'>

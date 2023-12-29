@@ -20,7 +20,7 @@ const ProjectPage = () => {
 
   const [project, setProject] = useState<TProject>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [page, setPage] = useState<'documents' | 'overview' | 'edit'>('overview')
+  const [page, setPage] = useState<'documents' | 'overview' | 'edit'>('documents')
   const getProject = async () => {
     setIsLoading(true)
     const RESPONSE = await get(`projects/${projectId}`, token)

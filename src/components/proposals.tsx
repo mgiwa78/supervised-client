@@ -136,23 +136,12 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
             <table className='table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3'>
               <thead>
                 <tr className='fw-bold text-muted'>
-                  <th className='w-25px'>
-                    <div className='form-check form-check-sm form-check-custom form-check-solid'>
-                      <input
-                        className='form-check-input'
-                        type='checkbox'
-                        value='1'
-                        data-kt-check='true'
-                        data-kt-check-target='.widget-13-check'
-                      />
-                    </div>
-                  </th>
-                  <th className='min-w-150px'>Id</th>
                   <th className='min-w-140px'>Title</th>
+                  <th className='min-w-140px'>Student</th>
                   <th className='min-w-120px'>Status</th>
                   <th className='min-w-120px'>Submited</th>
                   {currentUser?.roles.some((role) => role.name === 'Faculty Admin') && (
-                    <th className='min-w-120px'>Actions</th>
+                    <th className='min-w-120px text-center'>Actions</th>
                   )}
                 </tr>
               </thead>
@@ -163,20 +152,6 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
                     return (
                       <tr key={proposal._id}>
                         <td>
-                          <div className='form-check form-check-sm form-check-custom form-check-solid'>
-                            <input
-                              className='form-check-input widget-13-check'
-                              type='checkbox'
-                              value='1'
-                            />
-                          </div>
-                        </td>
-                        <td>
-                          <span className='text-dark fw-bold text-hover-primary fs-6'>
-                            {proposal._id}
-                          </span>
-                        </td>
-                        <td>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
                             {proposal.title}
                           </span>
@@ -185,7 +160,19 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
                           </span>
                         </td>
                         <td>
-                          <span className='badge badge-light-warning'>
+                          <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
+                            {proposal?.student?.lastName + ' ' + proposal?.student?.firstName}
+                          </span>
+                          <span className=' fw-semibold text-muted d-block fs-7'>
+                            {proposal?.student?.department?.name}
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            className={`badge badge-light-${
+                              proposal.status === 'Approved' ? 'Success' : 'warning'
+                            }`}
+                          >
                             {proposal.status || 'Pending'}
                           </span>
                         </td>
@@ -196,13 +183,14 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
                           {FormatDate(proposal.createdAt)}
                         </td>
                         {currentUser?.roles.some((role: any) => role.name === 'Faculty Admin') && (
-                          <td className='text-end'>
+                          <td className='text-center'>
                             <Link
                               to={`/facultyadmin/proposals/${proposal._id}`}
                               title='View'
-                              className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 mr-1'
+                              className='btn btn-primary btn-bg-light  btn-sm me-1 mr-1'
                             >
                               <KTIcon iconName='eye' className='fs-3' />
+                              View Proposal
                             </Link>
                           </td>
                         )}
@@ -230,7 +218,7 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
                   </tr>
                 )}
               </tbody>
-            </table>{' '}
+            </table>
             <div className='d-flex' style={{position: 'absolute', bottom: '20px', right: '20px'}}>
               <select
                 name='status'

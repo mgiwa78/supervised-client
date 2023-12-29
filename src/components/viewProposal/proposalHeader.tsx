@@ -10,21 +10,112 @@ import User from '../../types/User'
 import {Spinner} from '../../components/Spinner'
 import FormatDate from '../../utils/FormatDate'
 import {TProposal} from '../../types/Proposal'
+import TWorkflow from '../../types/Workflow'
+import * as swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import post from '../../lib/post'
+const MySwal = withReactContent(swal.default)
 
 type PropType = {
   proposal: TProposal
+  workflows: Array<TWorkflow>
   isLoading: boolean
   proposalId: string
   setPage: Function
   page: string
 }
-const ProposalHeader = ({proposal, isLoading, proposalId, setPage, page}: PropType) => {
+const ProposalHeader = ({proposal, isLoading, proposalId, setPage, page, workflows}: PropType) => {
   const location = useLocation()
+  const token = useSelector(selectToken)
+  let workFlowOptions: any = {}
 
+  useEffect(() => {
+    workflows.forEach((workflow) => {
+      workFlowOptions[workflow._id] = workflow.title
+    })
+  }, [workflows])
+  const handleApprove = async (proposal: TProposal) => {
+    // ...{[workflow._id]:[workflow.title]}
+
+    console.log(workFlowOptions)
+    MySwal.fire({
+      title: 'Are you sure, you want to approve this proposal?',
+      text: `Document title: ${document.title}`,
+      input: 'select',
+      inputOptions: workFlowOptions,
+      inputPlaceholder: 'Select Project Workflow',
+      inputValidator: (value) => {
+        return new Promise((resolve) => {
+          if (value) {
+            resolve()
+          } else {
+            resolve('You need to select a Workflow')
+          }
+        })
+      },
+      buttonsStyling: false,
+      confirmButtonText: 'Approve!',
+      showCancelButton: true,
+      heightAuto: false,
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-secondary',
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await post(
+          'proposals/approve',
+          {...proposal, workflow: result.value},
+          token,
+          true,
+          'Project Approved'
+        )
+      }
+    })
+  }
   return (
     <>
       {proposal && !isLoading && (
         <div className='card mb-5 mb-xl-10'>
+          <div className='card-toolbar' style={{position: 'absolute', right: 15, top: 15}}>
+            <button
+              type='button'
+              className='btn btn-sm btn-icon btn-color-primary btn-active-light-primary'
+              data-kt-menu-trigger='click'
+              data-kt-menu-placement='bottom-end'
+              data-kt-menu-flip='top-end'
+            >
+              <KTIcon iconName='category' className='fs-2' />
+            </button>
+            <div
+              className='menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold w-200px'
+              data-kt-menu='true'
+            >
+              <div className='menu-item px-3'>
+                <div
+                  onClick={() => handleApprove(proposal)}
+                  className='menu-link bg-hover-success text-hover-white  px-3'
+                >
+                  Approve
+                </div>
+              </div>
+              <div className='menu-item px-3'>
+                <a onClick={() => null} className='menu-link bg-hover-danger text-hover-white px-3'>
+                  Reject
+                </a>
+              </div>
+
+              <div className='separator mt-3 opacity-75'></div>
+
+              {/* <div className='menu-item px-3'>
+                <div className='menu-content px-3 py-3'>
+                  <a className='btn btn-primary btn-sm px-4' href='#'>
+                    Generate Reports
+                  </a>
+                </div>
+              </div> */}
+            </div>
+          </div>
           <div className='card-body pt-9 pb-0'>
             <div className='d-flex flex-wrap flex-sm-nowrap mb-6'>
               <div className='d-flex flex-center flex-shrink-0 bg-light rounded w-100px h-100px w-lg-150px h-lg-150px me-7 mb-4'>
@@ -111,12 +202,12 @@ const ProposalHeader = ({proposal, isLoading, proposalId, setPage, page}: PropTy
                 >
                   Documents
                 </button>
-                <button
+                {/* <button
                   className={`nav-link text-active-primary me-6 py-5 ` + (page === 'approve')}
                   onClick={() => setPage('approve')}
                 >
                   Approve
-                </button>
+                </button> */}
               </li>
             </ul>
           </div>

@@ -99,7 +99,8 @@ const useUserManagement = () => {
   const RemoveUser = () => dispatch({type: 'RemoveUser'})
 
   const createUser = async (newUserData: any, token: any) => {
-    const RESPONSE = await post(`users`, newUserData, token, true, 'User Updated')
+    await post(`users`, newUserData, token, true, 'User Updated')
+    getUsers(token, 'Users')
   }
 
   const getUserById = (id: any) => dispatch({type: 'getUserById', payload: id})
@@ -129,8 +130,8 @@ const useUserManagement = () => {
   }
   const updateUser = async (newUserData: any, token: any) => {
     // UpdateLoading(true)
-    const RESPONSE = await put(`users/${newUserData._id}`, newUserData, token, true, 'User Updated')
-
+    await put(`users/${newUserData._id}`, newUserData, token, true, 'User Updated')
+    getUsers(token, 'Users')
     // UpdateLoading(false)
     // dispatch({type: 'UpdateUser', payload: newUserData})
   }

@@ -10,15 +10,25 @@ import get from '../../lib/get'
 import ProposalOverview from './proposalOverview'
 import ProposalDocuments from './proposalDocuments'
 import ProposalApproval from './proposalApproval'
+import TWorkflow from '../../types/Workflow'
 
 const Proposal = () => {
   const token = useSelector(selectToken)
   const location = useLocation()
   const {proposalId} = useParams()
 
+  const [workflows, setWorkflows] = useState<Array<TWorkflow>>([])
   const [proposal, setProposal] = useState<TProposal>()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [page, setPage] = useState<'documents' | 'overview' | 'approve'>('overview')
+
+  const getWorkflows = async () => {
+    const RESPONSE = await get(`workflows`, token)
+    if (RESPONSE?.data) {
+      // setWorkflows(RESPONSE.data)
+      setWorkflows(RESPONSE.data)
+    }
+  }
 
   useEffect(() => {
     const getProposal = async () => {
@@ -32,6 +42,7 @@ const Proposal = () => {
       }
     }
     getProposal()
+    getWorkflows()
   }, [token, proposalId])
 
   const ProposalBreadcrumbs: Array<PageLink> = [
@@ -53,11 +64,12 @@ const Proposal = () => {
       <ProposalHeader
         isLoading={isLoading}
         page={page}
+        workflows={workflows}
         proposalId={proposalId}
         setPage={setPage}
         proposal={proposal}
       />
-      {page === 'overview' && <ProposalOverview proposal={proposal} />}
+      {page === 'overview' && <ProposalOverview proposal={proposal} workflows={workflows} />}
       {page === 'documents' && <ProposalDocuments documents={proposal.files} />}
       {page === 'approve' && <ProposalApproval proposal={proposal} />}
     </>

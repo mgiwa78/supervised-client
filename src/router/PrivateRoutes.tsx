@@ -113,11 +113,7 @@ const PrivateRoutes = () => {
 
           <Route path='edit/:documentID' element={<EditDocument />} />
 
-          <Route path=':projectId' element={<ProjectPage />}>
-            <Route path='overview' element={<ProjectOverview />} />
-            <Route path='supervisors' element={<ProjectOverview />} />
-            <Route path='documents' element={<ProjectDocuments />} />
-          </Route>
+          <Route path=':projectId' element={<ProjectPage />} />
         </Route>
 
         <Route path='students'>
