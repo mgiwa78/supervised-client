@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.44536845.css",
-    "main.js": "/static/js/main.172c78e8.js",
+    "main.js": "/static/js/main.ad2506d1.js",
     "static/media/keenicons-outline.svg?fzo4bm": "/static/media/keenicons-outline.3ca1e2fb58be11bb1130.svg",
     "static/media/la-brands-400.svg": "/static/media/la-brands-400.928495fae14841a0d610.svg",
     "static/media/la-solid-900.svg": "/static/media/la-solid-900.a813034654b4ff0a0bac.svg",
@@ -50,10 +50,10 @@
     "static/media/fa-v4compatibility.woff2": "/static/media/fa-v4compatibility.afac89562a5301459069.woff2",
     "index.html": "/index.html",
     "main.44536845.css.map": "/static/css/main.44536845.css.map",
-    "main.172c78e8.js.map": "/static/js/main.172c78e8.js.map"
+    "main.ad2506d1.js.map": "/static/js/main.ad2506d1.js.map"
   },
   "entrypoints": [
     "static/css/main.44536845.css",
-    "static/js/main.172c78e8.js"
+    "static/js/main.ad2506d1.js"
   ]
 }
