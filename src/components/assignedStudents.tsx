@@ -99,7 +99,7 @@ const AssignedStudents = ({role = 'Users'}) => {
                   <th className='min-w-120px'>Department</th>
                   {/* <th className='min-w-120px'>Roles</th> */}
                   <th className='min-w-120px'>Role</th>
-                  <th className='min-w-100px text-end'>Actions</th>
+                  <th className='min-w-100px text-center'>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -144,7 +144,7 @@ const AssignedStudents = ({role = 'Users'}) => {
                             </span>
                           ))}
                         </td>
-                        <td className='text-end'>
+                        <td className='text-center'>
                           {/* <a
                               href='#'
                               className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1'

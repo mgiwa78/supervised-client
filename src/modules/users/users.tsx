@@ -152,7 +152,7 @@ const Users = ({role = 'Users'}) => {
                   <th className='min-w-120px'>Department</th>
                   <th className='min-w-120px'>Role</th>
                   {currentUser?.roles.some((role) => role.name === 'Super Admin') && (
-                    <th className='min-w-100px text-end'>Actions</th>
+                    <th className='min-w-100px text-center'>Actions</th>
                   )}
                 </tr>
               </thead>
@@ -211,7 +211,7 @@ const Users = ({role = 'Users'}) => {
                           ))}
                         </td>
                         {currentUser?.roles.some((role) => role.name === 'Superadmin') && (
-                          <td className='text-end'>
+                          <td className='text-center'>
                             {/* <a
                               href='#'
                               className='btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1'

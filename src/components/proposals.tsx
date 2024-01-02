@@ -136,12 +136,15 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
             <table className='table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3'>
               <thead>
                 <tr className='fw-bold text-muted'>
-                  <th className='min-w-140px'>Title</th>
-                  <th className='min-w-140px'>Student</th>
+                  <th className='min-w-240px max-w-240px'>Title</th>
+                  {currentUser?.roles.some((role: any) => role.name !== 'Student') && (
+                    <th className='min-w-140px'>Student</th>
+                  )}
+
                   <th className='min-w-120px'>Status</th>
                   <th className='min-w-120px'>Submited</th>
                   {currentUser?.roles.some((role) => role.name === 'Faculty Admin') && (
-                    <th className='min-w-120px text-center'>Actions</th>
+                    <th className='min-w-250px text-center'>Actions</th>
                   )}
                 </tr>
               </thead>
@@ -151,7 +154,7 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
                   paginatedData.map((proposal: TProposal) => {
                     return (
                       <tr key={proposal._id}>
-                        <td>
+                        <td style={{maxWidth: 280}}>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
                             {proposal.title}
                           </span>
@@ -159,14 +162,16 @@ const ProposalsTable = ({role = 'Proposals', proposals, isLoading}: Proptypes) =
                             {proposal.description}
                           </span>
                         </td>
-                        <td>
-                          <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
-                            {proposal?.student?.lastName + ' ' + proposal?.student?.firstName}
-                          </span>
-                          <span className=' fw-semibold text-muted d-block fs-7'>
-                            {proposal?.student?.department?.name}
-                          </span>
-                        </td>
+                        {currentUser?.roles.some((role: any) => role.name !== 'Student') && (
+                          <td>
+                            <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
+                              {proposal?.student?.lastName + ' ' + proposal?.student?.firstName}
+                            </span>
+                            <span className=' fw-semibold text-muted d-block fs-7'>
+                              {proposal?.student?.department?.name}
+                            </span>
+                          </td>
+                        )}
                         <td>
                           <span
                             className={`badge badge-light-${

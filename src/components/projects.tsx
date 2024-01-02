@@ -129,11 +129,13 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
             <table className='table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3'>
               <thead>
                 <tr className='fw-bold text-muted'>
-                  <th className='min-w-140px'>Title</th>
-                  <th className='min-w-120px'>Student</th>
+                  <th className='min-w-240px max-w-150px'>Title</th>
+                  {currentUser?.roles.some((role: any) => role.name !== 'Student') && (
+                    <th className='min-w-120px'>Student</th>
+                  )}
                   <th className='min-w-120px'>Status</th>
                   <th className='min-w-120px'>Submited</th>
-                  <th className='min-w-120px text-center'>Actions</th>
+                  <th className='min-w-250px text-center'>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -151,7 +153,7 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
 
                     return (
                       <tr key={project._id}>
-                        <td>
+                        <td style={{maxWidth: 280}}>
                           <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
                             {project.title}
                           </span>
@@ -159,14 +161,16 @@ const Projects = ({projects, setProjects, isLoading, setIsLoading}: Props) => {
                             {project.description}
                           </span>
                         </td>
-                        <td>
-                          <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
-                            {project?.student?.lastName + ' ' + project?.student?.firstName}
-                          </span>
-                          <span className=' fw-semibold text-muted d-block fs-7'>
-                            {project?.student?.department?.name}
-                          </span>
-                        </td>
+                        {currentUser?.roles.some((role: any) => role.name !== 'Student') && (
+                          <td>
+                            <span className='text-dark fw-bold text-hover-primary d-block mb-1 fs-6'>
+                              {project?.student?.lastName + ' ' + project?.student?.firstName}
+                            </span>
+                            <span className=' fw-semibold text-muted d-block fs-7'>
+                              {project?.student?.department?.name}
+                            </span>
+                          </td>
+                        )}
                         <td>
                           <span
                             style={{backgroundColor: `${project.status.color}`}}
