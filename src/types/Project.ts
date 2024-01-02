@@ -1,3 +1,4 @@
+import TFile from './File'
 import TState from './States'
 import User from './User'
 import TWorkflow from './Workflow'
@@ -9,12 +10,7 @@ export interface TProject {
   description: string
   student: User
   workflow: TWorkflow
-  files: Array<{
-    _id: string
-    status: string
-    name: string
-    path: string
-  }>
+  files: Array<TFile>
   supervisor: string | User
   keywords: string[]
   completionDate: Date

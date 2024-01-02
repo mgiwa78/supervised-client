@@ -81,7 +81,7 @@ const HelpCenterOverview = ({setPage}: Props) => {
                         {ticket.subject}
                       </h3>
                       <span className='badge badge-light-warning my-1 d-block'>
-                        {ticket?._id || 'Pending'}
+                        {ticket?.status || 'Pending'}
                       </span>
                     </div>
                   </div>

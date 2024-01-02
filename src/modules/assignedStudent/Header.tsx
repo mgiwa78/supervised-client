@@ -155,48 +155,43 @@ const StudentOverviewHeader = ({setViewDoc}: propType) => {
                     </div>
                     <div className='separator separator-dashed my-1'></div>
                     <div id={`${state._id}`} className='collapse show '>
-                      <li className='d-flex align-items-center py-2 ' style={{marginLeft: '20px'}}>
-                        <span
-                          style={{cursor: 'pointer'}}
-                          className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
-                        >
-                          {project?.files.filter(
-                            (file) =>
-                              file?.status === state?._id ||
-                              (!file.status && state.position === '-1')
-                          ).length > 0 ? (
-                            project?.files
-                              .filter((file) => {
-                                if (!file.status && state.position === '-1') {
-                                  return !file.status
-                                } else return file?.status === state?._id
-                              })
-                              .map((file) => (
-                                <button
-                                  key={file._id}
-                                  style={{
-                                    textAlign: 'left',
-                                    cursor: 'pointer',
-                                    backgroundColor: 'transparent',
-                                    border: 'none',
-                                  }}
-                                  onClick={() => {
-                                    setViewDoc(file)
-                                  }}
-                                  className='fs-6 text-gray-700 text-hover-primary fw-bold mb-1 left'
-                                >
-                                  <span className='bullet me-5'></span> {file.name}
-                                </button>
-                              ))
-                          ) : (
-                            <span
-                              style={{cursor: 'pointer'}}
-                              className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
-                            >
-                              No Documents
-                            </span>
-                          )}
-                        </span>
+                      <li className='d-flex flex-column align-items-start py-2 '>
+                        {project?.files.filter(
+                          (file) =>
+                            file?.status?._id === state?._id ||
+                            (!file.status && state.position === '-1')
+                        ).length > 0 ? (
+                          project?.files
+                            .filter((file) => {
+                              if (!file.status && state.position === '-1') {
+                                return !file.status
+                              } else return file?.status._id === state?._id
+                            })
+                            .map((file) => (
+                              <button
+                                key={file._id}
+                                style={{
+                                  textAlign: 'left',
+                                  cursor: 'pointer',
+                                  backgroundColor: 'transparent',
+                                  border: 'none',
+                                }}
+                                onClick={() => {
+                                  setViewDoc(file)
+                                }}
+                                className='fs-6 text-gray-700 text-hover-primary fw-bold mb-1 left'
+                              >
+                                <span className='bullet me-5'></span> {file.title}
+                              </button>
+                            ))
+                        ) : (
+                          <span
+                            style={{cursor: 'pointer'}}
+                            className='fs-3  text-gray-500  text-center text-hover-primary fw-bold mb-1'
+                          >
+                            No Documents
+                          </span>
+                        )}
                       </li>
                     </div>
                   </div>

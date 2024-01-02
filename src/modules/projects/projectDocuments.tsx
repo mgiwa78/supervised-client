@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {Link, useLocation, useParams} from 'react-router-dom'
 import {KTIcon, toAbsoluteUrl} from '../../_metronic/helpers'
 import {useSelector} from 'react-redux'
@@ -11,6 +11,7 @@ import withReactContent from 'sweetalert2-react-content'
 import {TProject} from '../../types/Project'
 import FormatDate from '../../utils/FormatDate'
 import deleteReq from '../../lib/delete'
+import TFile from '../../types/File'
 
 const MySwal = withReactContent(swal.default)
 
@@ -25,49 +26,75 @@ const ProjectDocuments = ({project, refreshProject}: Props) => {
   const {projectId} = useParams()
   const token = useSelector(selectToken)
 
-  const handleDelete = (document: TDocument) => {
-    MySwal.fire({
-      title: 'Are you sure, you want to delete this document?',
-      text: `Document title: ${document.name}`,
-      icon: 'error',
-      buttonsStyling: false,
-      confirmButtonText: 'Yes Delete!',
-      showCancelButton: true,
-      heightAuto: false,
-      customClass: {
-        confirmButton: 'btn btn-danger',
-        cancelButton: 'btn btn-secondary',
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteFile(document).then((res) => {
-          if (res?.data) {
-            refreshProject()
-            MySwal.fire({
-              title: 'Deleted!',
-              text: 'File has been deleted.',
-              icon: 'success',
-            })
-          } else {
-            MySwal.fire({
-              title: 'Error',
-              text: res?.error,
-              icon: 'error',
-              confirmButtonText: 'Close!',
-              customClass: {
-                confirmButton: 'btn btn-danger',
-              },
-            })
-          }
-        })
-      }
-    })
-  }
-
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isDelete, setisDelete] = useState<boolean>(false)
   const [IsLoading, setIsLoading] = useState<boolean>(false)
   const [documents, setDocuments] = useState<Array<TDocument>>()
+  const [filter, setFilter] = useState(0)
+  const [fileStatus, setFileStatus] = useState<string>('')
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const filteredProjectFiles = useMemo(() => {
+    if (!fileStatus) {
+      return project.files
+    }
+    return project.files?.filter(
+      (file) => file.status?._id === fileStatus || file.title === searchTerm
+    )
+  }, [project.files, fileStatus])
+
+  const handleDelete = (document: TFile) => {
+    console.log(document)
+    if (document?.status?.position !== '-1' && document.status !== null) {
+      MySwal.fire({
+        title: "File can't be deleted",
+        text: `${document.title}, has been moved from backlog`,
+        icon: 'error',
+        buttonsStyling: false,
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'btn btn-danger',
+        },
+      })
+    } else {
+      MySwal.fire({
+        title: 'Are you sure, you want to delete this document?',
+        text: `Document title: ${document.title}`,
+        icon: 'error',
+        buttonsStyling: false,
+        confirmButtonText: 'Yes Delete!',
+        showCancelButton: true,
+        heightAuto: false,
+        customClass: {
+          confirmButton: 'btn btn-danger',
+          cancelButton: 'btn btn-secondary',
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deleteFile(document).then((res) => {
+            if (res?.data) {
+              refreshProject()
+              MySwal.fire({
+                title: 'Deleted!',
+                text: 'File has been deleted.',
+                icon: 'success',
+              })
+            } else {
+              MySwal.fire({
+                title: 'Error',
+                text: res?.error,
+                icon: 'error',
+                confirmButtonText: 'Close!',
+                customClass: {
+                  confirmButton: 'btn btn-danger',
+                },
+              })
+            }
+          })
+        }
+      })
+    }
+  }
 
   const handleClose = () => {
     setIsOpen(false)
@@ -114,6 +141,7 @@ const ProjectDocuments = ({project, refreshProject}: Props) => {
             <input
               type='text'
               id='kt_filter_search'
+              onChange={(e) => setSearchTerm(e.target.value)}
               className='form-control form-control-sm form-control-solid w-150px ps-10'
               placeholder='Search'
             />
@@ -128,7 +156,10 @@ const ProjectDocuments = ({project, refreshProject}: Props) => {
               tabIndex={-1}
               aria-hidden='true'
               data-kt-initialized='1'
-              defaultValue={'Backlog'}
+              defaultValue={''}
+              onChange={(e) => {
+                setFileStatus(e.target.value)
+              }}
             >
               <option value='' data-select2-id='select2-data-11-t490'>
                 Select State
@@ -148,7 +179,7 @@ const ProjectDocuments = ({project, refreshProject}: Props) => {
         </div>
       </div>
       <div className='row g-6 g-xl-9 mb-6 mb-xl-9'>
-        {project.files?.map((document: any) => (
+        {filteredProjectFiles?.map((document: any) => (
           <div key={document._id} className='col-md-6 col-lg-4 col-xl-3'>
             <div className='card h-100' style={{position: 'relative'}}>
               <button
@@ -181,7 +212,7 @@ const ProjectDocuments = ({project, refreshProject}: Props) => {
                       alt=''
                     />
                   </div>
-                  <div className='fs-5 fw-bold mb-2'>{document.name}</div>
+                  <div className='fs-5 fw-bold mb-2'>{document.title || document.name}</div>
                 </span>
                 <div className='fs-4 fw-semibold text-gray-400'>
                   {FormatDate(document.createdAt)}

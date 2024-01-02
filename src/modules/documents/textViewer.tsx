@@ -85,8 +85,7 @@ const FileViewer = ({file}: PropeType) => {
             <Inject
               services={[
                 Toolbar,
-                Magnification,
-                Navigation,
+
                 Annotation,
                 LinkAnnotation,
                 BookmarkView,

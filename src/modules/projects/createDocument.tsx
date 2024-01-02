@@ -43,6 +43,7 @@ const CreateDocument = ({handleClose, refreshProject}: Props) => {
   }
 
   const {getRootProps, getInputProps, acceptedFiles} = useDropzone({
+    multiple: false,
     accept: {
       'application/*': [
         'vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -63,39 +64,25 @@ const CreateDocument = ({handleClose, refreshProject}: Props) => {
 
       try {
         console.log(values)
-        // const RESPONSE: any = await post(
-        //   `projects/uploadDocument/${projectId}`,
-        //   {projectId, ...values},
-        //   token,
-        //   true,
-        //   'Document Created'
-        // )
 
-        // if (RESPONSE?.data) {
-        const all = acceptedFiles.map(async (e) => {
-          const fileUploadData = await hadlefileFileUpload(projectId, e)
+        const fileUploadData = await hadlefileFileUpload(projectId, acceptedFiles[0])
+        const a = await getDownloadURL(fileUploadData.ref)
 
-          const a = await getDownloadURL(fileUploadData.ref)
+        const data = {path: a, title: values.title, description: values.description}
 
-          return {path: a, name: fileUploadData.name}
+        console.log(data)
+        await put(
+          `projects/uploadDocument/${projectId}`,
+          {files: [data]},
+          token,
+          true,
+          'Documents Submitted'
+        ).then(() => {
+          files = []
+          formik.resetForm()
+          refreshProject()
         })
 
-        await Promise.all(all)
-          .then(async (data) => {
-            const e = data
-            await put(
-              `projects/uploadDocument/${projectId}`,
-              {files: e},
-              token,
-              true,
-              'Documents Submitted'
-            )
-          })
-          .then(() => {
-            files = []
-            formik.resetForm()
-            refreshProject()
-          })
         // }
         handleClose()
 

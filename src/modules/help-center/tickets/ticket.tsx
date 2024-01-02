@@ -1,15 +1,32 @@
 import React, {useEffect, useState} from 'react'
 import {useSelector} from 'react-redux'
-import {selectToken} from '../../../redux/selectors/auth'
+import {selectToken, selectUser} from '../../../redux/selectors/auth'
 import TTicket from '../../../types/ticket'
 import get from '../../../lib/get'
 import {formatDistanceToNow} from 'date-fns'
+import * as Yup from 'yup'
+import {useFormik} from 'formik'
+import put from '../../../lib/put'
+import post from '../../../lib/post'
+import TTicketResponse from '../../../types/ticket-response'
 
 type Props = {ticket: TTicket}
 
+const initialValues = {
+  message: '',
+}
+const ticketResponseSchema = Yup.object().shape({
+  message: Yup.string().required('Message is required'),
+})
+
 const Ticket = ({ticket}: Props) => {
+  const currentUser = useSelector(selectUser)
+
   const token = useSelector(selectToken)
+  const [IsLoading, setIsLoading] = useState<boolean>(false)
+
   const [tickets, setTickets] = useState<Array<TTicket>>()
+  const [ticketsResponses, setTicketsResponses] = useState<Array<TTicketResponse>>()
 
   const getTicket = async () => {
     const RESPONSE = await get('tickets', token)
@@ -18,11 +35,56 @@ const Ticket = ({ticket}: Props) => {
       setTickets(RESPONSE.data)
     }
   }
+  const getTicketResponses = async () => {
+    const RESPONSE = await get(`tickets-response/${ticket._id}`, token)
+
+    if (RESPONSE?.data) {
+      setTicketsResponses(RESPONSE.data)
+    }
+  }
 
   useEffect(() => {
     getTicket()
+    getTicketResponses()
   }, [token])
-  
+
+  const formik = useFormik({
+    initialValues,
+    validationSchema: ticketResponseSchema,
+    onSubmit: async (values, {setStatus, setSubmitting}) => {
+      setIsLoading(true)
+      try {
+        await post(
+          'tickets-response',
+          {...values, ticketId: ticket._id},
+          token,
+          true,
+          'Response Submitted'
+        )
+
+        if (1) {
+          formik.values = initialValues
+          getTicket()
+        }
+
+        setSubmitting(false)
+        setIsLoading(false)
+      } catch (error: any) {
+        console.log(error)
+        setSubmitting(false)
+        setIsLoading(false)
+
+        if (error.response?.data.message) {
+          return setStatus(error.response.data.message)
+        }
+        if (error.response?.data.error) {
+          return setStatus(error.response.data.error)
+        } else {
+          return setStatus(error.error)
+        }
+      }
+    },
+  })
   return (
     <div className='card'>
       <div className='card-body'>
@@ -46,7 +108,7 @@ const Ticket = ({ticket}: Props) => {
                     <span className='fw-semibold text-muted me-6'>
                       By:
                       <a href='#' className='text-muted text-hover-primary'>
-                        {ticket?.author?.lastName + ' ' + ticket?.author?.lastName}
+                        {ticket?.author?.lastName + ' ' + ticket?.author?.firstName}
                       </a>
                     </span>
                     <span className='fw-semibold text-muted'>
@@ -59,10 +121,56 @@ const Ticket = ({ticket}: Props) => {
                   </div>
                 </div>
               </div>
+
               <div className='mb-15' data-select2-id='select2-data-140-7rzi'>
                 <div className='mb-15 fs-5 fw-normal text-gray-800'>
                   <div className='mb-5 fs-5'>Hello,</div>
                   <div className='mb-10'>{ticket.description}</div>
+
+                  <div className='mb-9'>
+                    <h1 className='text-gray-800 fw-semibold mb-10'>Responses</h1>
+                    {ticketsResponses?.map((ticketsResponse) => (
+                      <div key={ticketsResponse._id} className='card card-bordered w-100 mb-10'>
+                        <div className='card-body'>
+                          <div className='w-100 d-flex flex-stack mb-8'>
+                            <div className='d-flex align-items-center f'>
+                              <div className='symbol symbol-50px me-5'>
+                                <div className='symbol-label fs-1 fw-bold bg-light-success text-success'>
+                                  {ticketsResponse.author.lastName[0]}
+                                </div>
+                              </div>
+                              <div className='d-flex flex-column fw-semibold fs-5 text-gray-600 text-dark'>
+                                <div className='d-flex align-items-center'>
+                                  <a className='text-gray-800 fw-bold text-hover-primary fs-5 me-3'>
+                                    {ticketsResponse.author.lastName +
+                                      ' ' +
+                                      ticketsResponse.author.firstName}
+                                  </a>
+                                  {ticket.author._id === ticketsResponse.author._id && (
+                                    <span className='badge badge-light-danger'>Author</span>
+                                  )}
+                                </div>
+                                <span className='text-muted fw-semibold fs-6'>
+                                  {' '}
+                                  {formatDistanceToNow(new Date(ticketsResponse?.createdAt), {
+                                    addSuffix: true,
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                            {/* <div className='m-0'>
+                              <button className='btn btn-color-gray-400 btn-active-color-primary p-0 fw-bold'>
+                                Reply
+                              </button>
+                            </div> */}
+                          </div>
+                          <p className='fw-normal fs-5 text-gray-700 m-0'>
+                            {ticketsResponse.message}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
                   <div className='row mb-7'>
                     <div className='col-sm-3 fv-row mb-3' data-select2-id='select2-data-155-jmvd'>
@@ -92,19 +200,37 @@ const Ticket = ({ticket}: Props) => {
                       </select>
                     </div>
                   </div>
+
                   <div className='mb-0'>
-                    <textarea
-                      className='form-control form-control-solid placeholder-gray-600 fw-bold fs-4 ps-9 pt-7'
-                      rows={6}
-                      name='message'
-                      placeholder='Share Your Knowledge'
-                    ></textarea>
-                    <button
-                      type='submit'
-                      className='btn btn-primary mt-n20 mb-20 position-relative float-end me-7'
-                    >
-                      Send
-                    </button>
+                    <form onSubmit={formik.handleSubmit}>
+                      <textarea
+                        className='form-control form-control-solid placeholder-gray-600 fw-bold fs-4 ps-9 pt-7'
+                        rows={6}
+                        {...formik.getFieldProps('message')}
+                        placeholder='Share Your Knowledge'
+                      ></textarea>
+                      {formik.touched.message && formik.errors.message && (
+                        <div className='fv-plugins-message-container'>
+                          <div className='fv-help-block'>
+                            <span role='alert'>{formik.errors.message}</span>
+                          </div>
+                        </div>
+                      )}
+                      <button
+                        type='submit'
+                        id='kt_sign_in_submit'
+                        className='btn btn-primary mt-5'
+                        disabled={formik.isSubmitting || !formik.isValid}
+                      >
+                        {!IsLoading && <span className='indicator-label'>Send </span>}
+                        {IsLoading && (
+                          <span className='indicator-progress' style={{display: 'block'}}>
+                            Please wait...
+                            <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                          </span>
+                        )}
+                      </button>
+                    </form>
                   </div>
                 </div>
               </div>
